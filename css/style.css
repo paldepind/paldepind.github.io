@@ -205,13 +205,16 @@
 
 body {
     color: #222;
-    font-size: 16px;
+    font-size: 15px;
     font-family: et-book, Palatino, "Palatino Linotype", "Palatino LT STD", "Book Antiqua", Georgia, serif;
     background-color: #fffff8;
+    padding: 1em;
 }
 
 @media (min-width: 600px) {
     body {
+        font-size: 16px;
+        padding: 0;
         margin: 0px auto 0px auto;
         width: 600px;
     }
@@ -243,6 +246,10 @@ nav {
     margin-left: 12px;
     text-decoration: none;
     text-transform: uppercase;
+}
+
+nav a:link:not(:first-child) {
+    margin-left: .2em;
 }
 
 footer {
