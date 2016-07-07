@@ -3,9 +3,28 @@ title: Tu Quoque
 author: Julius
 ---
 
+Tufte CSS provides tools to style web articles using the ideas
+demonstrated by Edward Tufte’s `code` books and handouts. Tufte’s style is
+known for its simplicity, extensive use of sidenotes, tight
+integration of graphics with text, and carefully chosen typography.
+
+abcde­fghijklmnopqrstu­vwxyz­abcde­fghijklmnopqrstu­vwxyz­abcd
+
+```haskell
+fac n = foldr (*) 1 [1..n]
+```
+
 Vestibulum leo turpis, dignissim quis ultrices sit amet, iaculis ac ligula.
 Pellentesque tristique, velit eget scelerisque scelerisque, est dolor ultrices
-arcu, quis ullamcorper justo arcu luctus mauris. Integer congue molestie nisi id
+arcu, quis ullamcorper justo arcu luctus mauris.
+
+```javascript
+function(hello) {
+  console.log(what);
+}
+```
+
+Integer congue molestie nisi id
 posuere. Fusce pellentesque gravida tempus. Integer viverra tortor nec eros
 mollis quis convallis sem laoreet. Nulla id libero ac erat varius laoreet. Proin
 sed est est. Curabitur lacinia fermentum lorem, elementum malesuada ipsum
