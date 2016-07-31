@@ -211,17 +211,18 @@ body {
     padding: 1em;
 }
 
-@media (min-width: 600px) {
+@media (min-width: 640px) {
     body {
         font-size: 16px;
         padding: 0;
         margin: 0px auto 0px auto;
-        width: 600px;
+        width: 640px;
     }
 }
 
 header {
-    border-bottom: 2px solid black;
+    color: #93a1a1;
+    border-bottom: 2px solid #eee8d5;
     margin-bottom: 30px;
     padding: 12px 0px 12px 0px;
 }
@@ -231,7 +232,6 @@ header a:link {
 }
 
 div#logo a {
-    color: black;
     float: left;
     font-size: 115%;
     font-weight: bold;
@@ -240,21 +240,18 @@ div#logo a {
 
 nav {
     text-align: right;
-    color: black;
     font-size: 105%;
     font-weight: bold;
-    margin-left: 12px;
     text-decoration: none;
-    text-transform: uppercase;
 }
 
 nav a:link:not(:first-child) {
-    margin-left: .2em;
+    margin-left: .6em;
 }
 
 footer {
-    border-top: solid 2px black;
-    color: #555;
+    border-top: solid 2px #eee8d5;
+    color: #93a1a1;
     font-size: 100%;
     margin-top: 30px;
     padding: 12px 0px 12px 0px;
@@ -270,7 +267,6 @@ h1 {
 }
 
 h2 {
-    font-style: italic;
     font-weight: 400;
     margin-top: 2.1rem;
     margin-bottom: 0;
@@ -279,7 +275,6 @@ h2 {
 }
 
 h3 {
-    font-style: italic;
     font-weight: 400;
     font-size: 1.7rem;
     margin-top: 2rem;
@@ -290,7 +285,7 @@ h3 {
 div.info {
     color: #555;
     font-size: 110%;
-    font-style: italic;
+    /*font-style: italic;*/
 }
 
 p, ol, ul {
@@ -307,7 +302,7 @@ p {
 
 
 p.subtitle {
-    font-style: italic;
+    /*font-style: italic;*/
     margin-top: 1rem;
     margin-bottom: 1rem;
     font-size: 1.8rem;
@@ -374,3 +369,34 @@ td.sourceCode { padding-left: 5px; }
 .sourceCode span.fu { color: #06287e; }
 .sourceCode span.re { }
 .sourceCode span.er { color: red; font-weight: bold; }
+
+/* Seperator */
+
+hr {
+    padding: 0;
+    border: none;
+    background: #333;
+    height: 1px;
+    position: relative;
+}
+
+hr:after {
+    content: "";
+    width: 5px;
+    height: 5px;
+    border-radius: 7px;
+    border: 1px solid #000;
+    background: #fff;
+    display: block;
+    position: absolute;
+    top: -3px;
+    left: 50%;
+}
+
+blockquote {
+  border-left: 3px solid #eee8d5;
+  margin-left: 1em;
+  padding-left: 1em;
+  font-size: .9em;
+  line-height: 1.8em;
+}
