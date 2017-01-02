@@ -15,7 +15,7 @@ pygmentsuseclasses = true
     linkedin = "paldepind"
 
 [permalinks]
-    post = "/:year/:month/:day/:title"
+    post = "blog/:title"
     page = "/:title"
 
 [[menu.main]]
