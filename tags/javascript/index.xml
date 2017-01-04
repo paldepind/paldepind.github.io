@@ -11,7 +11,7 @@
     <item>
       <title>Introducing Jabz</title>
       <link>http://vindum.io/blog/introducing-jabz</link>
-      <pubDate>Mon, 02 Jan 2017 14:25:45 +0100</pubDate>
+      <pubDate>Wed, 04 Jan 2017 14:25:45 +0100</pubDate>
       
       <guid>http://vindum.io/blog/introducing-jabz</guid>
       <description>
@@ -113,7 +113,7 @@ more fundamental, methods.&lt;/p&gt;
 
 &lt;p&gt;In all cases the number of methods that Fantasy Land requires by its
 implementations are as few as possible. What it defines constitutes a
-&lt;em&gt;minimal complete definition&lt;/em&gt; of the given abstraction.&lt;/p&gt;
+minimal complete definition of the given abstraction.&lt;/p&gt;
 
 &lt;div class=&#34;info-box&#34;&gt;
   &lt;p&gt;A &lt;em&gt;minimal complete definition&lt;/em&gt; is a set of methods describing an
@@ -127,7 +127,7 @@ abstraction where none of the methods can be derived in terms of the other.&lt;/
 structures maintains a size that can be obtained in constant time.
 Thus, for these data structures using the generalized &lt;code&gt;size&lt;/code&gt; function incurs a
 prohibitively expensive overhead. In practice this means that our
-abstracted &lt;code&gt;size&lt;/code&gt; function sadly isn&amp;rsquo;t all too useful. But from the
+abstracted &lt;code&gt;size&lt;/code&gt; function, sadly, isn&amp;rsquo;t all too useful. But with the
 Fantasy Land specification we can&amp;rsquo;t do better.&lt;/p&gt;
 
 &lt;div class=&#34;info-box&#34;&gt;
@@ -154,7 +154,7 @@ from implementing in a specialized way.&lt;/p&gt;
 &lt;p&gt;The fact that Jabz specifies a lot more methods than Fantasy Land places
 an extra burden on implementations. Therefore these are meant to be
 created with support from the library. This makes it very convenient
-to implement abstractions.&lt;/p&gt;
+to implement the abstractions.&lt;/p&gt;
 
 &lt;p&gt;Jabz achieves this by offering functions that take classes and ensures
 that they have the necessary methods. These functions only require
@@ -187,15 +187,16 @@ fancy syntax for applying functions to classes.&lt;/p&gt;
 These names make sense for the list instance of monoid where &lt;code&gt;empty&lt;/code&gt;
 gives the empty list and &lt;code&gt;concat&lt;/code&gt; does list concatenation. However, for
 other instances they are very awkward. One example is the &lt;code&gt;Max&lt;/code&gt; monoid
-whose elements are number and where infinity is the identity element
+whose elements are numbers and where infinity is the identity element
 and the merge operation returns the minimum of two numbers. In this
 case &lt;code&gt;empty&lt;/code&gt; is a very counterintuitive name for a function that
 returns infinity.&lt;/p&gt;
 
 &lt;p&gt;In Jabz the monoid methods are instead called &lt;code&gt;identity&lt;/code&gt; and
-&lt;code&gt;combine&lt;/code&gt;. These names are just as abstract as the concept monoid
-itself. This ensures that no specific instances of Monoid ends up with
-non-intuitive names.&lt;/p&gt;
+&lt;code&gt;combine&lt;/code&gt;. These names should be fairly easy to understand while
+ensuring that no specific instances of Monoid ends up with
+non-intuitive names. The idea is that abstract concepts should have
+abstract names.&lt;/p&gt;
 
 &lt;h2 id=&#34;speedy-applicatives&#34;&gt;Speedy applicatives&lt;/h2&gt;
 
@@ -215,23 +216,23 @@ might work like this:&lt;/p&gt;
 &lt;div class=&#34;highlight&#34;&gt;&lt;pre&gt;&lt;code class=&#34;language-javascript&#34; data-lang=&#34;javascript&#34;&gt;&lt;span&gt;&lt;/span&gt;&lt;span class=&#34;nx&#34;&gt;lift&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;nx&#34;&gt;f&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;nx&#34;&gt;a&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;nx&#34;&gt;b&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;nx&#34;&gt;c&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;);&lt;/span&gt;
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
 
-&lt;p&gt;However, there is a problem with this. Let&amp;rsquo;s say &lt;code&gt;f&lt;/code&gt; is any function
-taking &lt;code&gt;n&lt;/code&gt; arguments. If we only have the methods &lt;code&gt;ap&lt;/code&gt; and &lt;code&gt;of&lt;/code&gt;, there
-is no way to apply &lt;code&gt;f&lt;/code&gt; to &lt;code&gt;n&lt;/code&gt; applicatives without currying &lt;code&gt;f&lt;/code&gt; and
-calling the curried function &lt;code&gt;n&lt;/code&gt; times. This hurts performance pretty
-badly. In most cases it may not matter. But why have applicatives with
-an unnecessary performance overhead?&lt;/p&gt;
+&lt;p&gt;However, there is a problem here. Let&amp;rsquo;s say &lt;code&gt;f&lt;/code&gt; is any function taking
+&lt;code&gt;n&lt;/code&gt; arguments. If we only have the methods &lt;code&gt;ap&lt;/code&gt; and &lt;code&gt;of&lt;/code&gt;, there is no
+way to apply &lt;code&gt;f&lt;/code&gt; to &lt;code&gt;n&lt;/code&gt; applicatives without currying &lt;code&gt;f&lt;/code&gt; and calling
+the curried function &lt;code&gt;n&lt;/code&gt; times. This hurts performance pretty badly.
+In most cases it may not matter. But why have applicatives with an
+unnecessary performance overhead?&lt;/p&gt;
 
-&lt;p&gt;Unpleased with the situation, Jabz requires applicatives to bring their
-own &lt;code&gt;lift&lt;/code&gt; method. But &lt;code&gt;lift&lt;/code&gt; can be derived, so if they don&amp;rsquo;t they
-will be given the default slow one. This has the significant advantage
-that for a specific structure it is often easy to implement &lt;code&gt;lift&lt;/code&gt; so
-that the function to lift does not have to be curried and is only
-applied once.&lt;/p&gt;
+&lt;p&gt;Unplaced with the situation, Jabz allows applicatives to bring their
+own &lt;code&gt;lift&lt;/code&gt; method. &lt;code&gt;lift&lt;/code&gt; can be derived, so if they don&amp;rsquo;t they will
+be given the default slow one. This has the significant advantage that
+for a specific structure it is often easy to implement &lt;code&gt;lift&lt;/code&gt; so that
+the function to lift does not have to be curried and is only applied
+once.&lt;/p&gt;
 
 &lt;p&gt;To see what the difference can be in practice I&amp;rsquo;ve created a small
 benchmark that compares lifting a function over Jabz&amp;rsquo;s &lt;code&gt;Maybe&lt;/code&gt; with
-&lt;code&gt;lift&lt;/code&gt; and with &lt;code&gt;ap&lt;/code&gt;.&lt;/p&gt;
+&lt;code&gt;lift&lt;/code&gt; and with &lt;code&gt;ap&lt;/code&gt;. &lt;a href=&#34;https://github.com/Funkia/jabz/blob/master/benchmark/aplift.suite.js&#34;&gt;The source code can be found here&lt;/a&gt;.&lt;/p&gt;
 &lt;div class=&#34;highlight&#34;&gt;&lt;pre&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span&gt;&lt;/span&gt;-------------------- &lt;span class=&#34;sb&#34;&gt;`&lt;/span&gt;ap&lt;span class=&#34;sb&#34;&gt;`&lt;/span&gt; vs &lt;span class=&#34;sb&#34;&gt;`&lt;/span&gt;lift&lt;span class=&#34;sb&#34;&gt;`&lt;/span&gt; on &lt;span class=&#34;sb&#34;&gt;`&lt;/span&gt;Maybe&lt;span class=&#34;sb&#34;&gt;`&lt;/span&gt; --------------------
 lift                        9150491.49 op/s ±  4.45%   &lt;span class=&#34;o&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;m&#34;&gt;68&lt;/span&gt; samples&lt;span class=&#34;o&#34;&gt;)&lt;/span&gt;
 ap                          1665864.27 op/s ±  1.31%   &lt;span class=&#34;o&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;m&#34;&gt;85&lt;/span&gt; samples&lt;span class=&#34;o&#34;&gt;)&lt;/span&gt;
@@ -360,11 +361,12 @@ ideas to the table. Especially in terms of creating low-overhead
 abstractions with as many features as one can squeeze out of the them.&lt;/p&gt;
 
 &lt;p&gt;Jabz is still far from finished. As a specification Fantasy Land is
-more comprehensive. Jabz currently only specify functor, applicative,
-monad, foldable and traversable. And while it does provide both a
-healthy set of utility function for working with the abstractions and
-some commonly used implementations of the specification there is still
-a lot to add.&lt;/p&gt;
+more comprehensive. Jabz currently only specifies functor,
+applicative, monad, foldable and traversable. And while it does
+provide both a healthy set of utility function for working with the
+abstractions and some commonly used implementations of the
+specification there is still a lot to add. Contributions and feedback
+is much appreciated.&lt;/p&gt;
 
 &lt;p&gt;The library can &lt;a href=&#34;https://github.com/Funkia/jabz&#34;&gt;be found on Gitub&lt;/a&gt;.&lt;/p&gt;
 </description>

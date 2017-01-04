@@ -20,6 +20,7 @@
 
 <link rel="stylesheet" href="http://vindum.io/css/main.css" media="all">
 <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Merriweather:400|Lato:400,400italic,700">
+<link href="https://fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet">
 
   </head>
   <body>
@@ -52,7 +53,7 @@
     <h1 class="article-title">Introducing Jabz</h1>
 
     
-    <span class="article-date">January 2, 2017</span>
+    <span class="article-date">January 4, 2017</span>
     
 
     <div class="article-content">
@@ -155,7 +156,7 @@ more fundamental, methods.</p>
 
 <p>In all cases the number of methods that Fantasy Land requires by its
 implementations are as few as possible. What it defines constitutes a
-<em>minimal complete definition</em> of the given abstraction.</p>
+minimal complete definition of the given abstraction.</p>
 
 <div class="info-box">
   <p>A <em>minimal complete definition</em> is a set of methods describing an
@@ -169,7 +170,7 @@ abstraction where none of the methods can be derived in terms of the other.</p>
 structures maintains a size that can be obtained in constant time.
 Thus, for these data structures using the generalized <code>size</code> function incurs a
 prohibitively expensive overhead. In practice this means that our
-abstracted <code>size</code> function sadly isn&rsquo;t all too useful. But from the
+abstracted <code>size</code> function, sadly, isn&rsquo;t all too useful. But with the
 Fantasy Land specification we can&rsquo;t do better.</p>
 
 <div class="info-box">
@@ -196,7 +197,7 @@ from implementing in a specialized way.</p>
 <p>The fact that Jabz specifies a lot more methods than Fantasy Land places
 an extra burden on implementations. Therefore these are meant to be
 created with support from the library. This makes it very convenient
-to implement abstractions.</p>
+to implement the abstractions.</p>
 
 <p>Jabz achieves this by offering functions that take classes and ensures
 that they have the necessary methods. These functions only require
@@ -229,15 +230,16 @@ fancy syntax for applying functions to classes.</p>
 These names make sense for the list instance of monoid where <code>empty</code>
 gives the empty list and <code>concat</code> does list concatenation. However, for
 other instances they are very awkward. One example is the <code>Max</code> monoid
-whose elements are number and where infinity is the identity element
+whose elements are numbers and where infinity is the identity element
 and the merge operation returns the minimum of two numbers. In this
 case <code>empty</code> is a very counterintuitive name for a function that
 returns infinity.</p>
 
 <p>In Jabz the monoid methods are instead called <code>identity</code> and
-<code>combine</code>. These names are just as abstract as the concept monoid
-itself. This ensures that no specific instances of Monoid ends up with
-non-intuitive names.</p>
+<code>combine</code>. These names should be fairly easy to understand while
+ensuring that no specific instances of Monoid ends up with
+non-intuitive names. The idea is that abstract concepts should have
+abstract names.</p>
 
 <h2 id="speedy-applicatives">Speedy applicatives</h2>
 
@@ -257,23 +259,23 @@ might work like this:</p>
 <div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span></span><span class="nx">lift</span><span class="p">(</span><span class="nx">f</span><span class="p">,</span> <span class="nx">a</span><span class="p">,</span> <span class="nx">b</span><span class="p">,</span> <span class="nx">c</span><span class="p">);</span>
 </code></pre></div>
 
-<p>However, there is a problem with this. Let&rsquo;s say <code>f</code> is any function
-taking <code>n</code> arguments. If we only have the methods <code>ap</code> and <code>of</code>, there
-is no way to apply <code>f</code> to <code>n</code> applicatives without currying <code>f</code> and
-calling the curried function <code>n</code> times. This hurts performance pretty
-badly. In most cases it may not matter. But why have applicatives with
-an unnecessary performance overhead?</p>
+<p>However, there is a problem here. Let&rsquo;s say <code>f</code> is any function taking
+<code>n</code> arguments. If we only have the methods <code>ap</code> and <code>of</code>, there is no
+way to apply <code>f</code> to <code>n</code> applicatives without currying <code>f</code> and calling
+the curried function <code>n</code> times. This hurts performance pretty badly.
+In most cases it may not matter. But why have applicatives with an
+unnecessary performance overhead?</p>
 
-<p>Unpleased with the situation, Jabz requires applicatives to bring their
-own <code>lift</code> method. But <code>lift</code> can be derived, so if they don&rsquo;t they
-will be given the default slow one. This has the significant advantage
-that for a specific structure it is often easy to implement <code>lift</code> so
-that the function to lift does not have to be curried and is only
-applied once.</p>
+<p>Unplaced with the situation, Jabz allows applicatives to bring their
+own <code>lift</code> method. <code>lift</code> can be derived, so if they don&rsquo;t they will
+be given the default slow one. This has the significant advantage that
+for a specific structure it is often easy to implement <code>lift</code> so that
+the function to lift does not have to be curried and is only applied
+once.</p>
 
 <p>To see what the difference can be in practice I&rsquo;ve created a small
 benchmark that compares lifting a function over Jabz&rsquo;s <code>Maybe</code> with
-<code>lift</code> and with <code>ap</code>.</p>
+<code>lift</code> and with <code>ap</code>. <a href="https://github.com/Funkia/jabz/blob/master/benchmark/aplift.suite.js">The source code can be found here</a>.</p>
 <div class="highlight"><pre><code class="language-bash" data-lang="bash"><span></span>-------------------- <span class="sb">`</span>ap<span class="sb">`</span> vs <span class="sb">`</span>lift<span class="sb">`</span> on <span class="sb">`</span>Maybe<span class="sb">`</span> --------------------
 lift                        9150491.49 op/s ±  4.45%   <span class="o">(</span><span class="m">68</span> samples<span class="o">)</span>
 ap                          1665864.27 op/s ±  1.31%   <span class="o">(</span><span class="m">85</span> samples<span class="o">)</span>
@@ -402,11 +404,12 @@ ideas to the table. Especially in terms of creating low-overhead
 abstractions with as many features as one can squeeze out of the them.</p>
 
 <p>Jabz is still far from finished. As a specification Fantasy Land is
-more comprehensive. Jabz currently only specify functor, applicative,
-monad, foldable and traversable. And while it does provide both a
-healthy set of utility function for working with the abstractions and
-some commonly used implementations of the specification there is still
-a lot to add.</p>
+more comprehensive. Jabz currently only specifies functor,
+applicative, monad, foldable and traversable. And while it does
+provide both a healthy set of utility function for working with the
+abstractions and some commonly used implementations of the
+specification there is still a lot to add. Contributions and feedback
+is much appreciated.</p>
 
 <p>The library can <a href="https://github.com/Funkia/jabz">be found on Gitub</a>.</p>
 
