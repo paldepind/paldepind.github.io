@@ -1,7 +1,7 @@
 +++
 description = ""
 title = "Introducing Jabz"
-date = "2017-01-02T14:25:45+01:00"
+date = "2017-01-04T14:25:45+01:00"
 categories = []
 tags = ["javascript"]
 +++
@@ -101,7 +101,7 @@ more fundamental, methods.
 
 In all cases the number of methods that Fantasy Land requires by its
 implementations are as few as possible. What it defines constitutes a
-_minimal complete definition_ of the given abstraction.
+minimal complete definition of the given abstraction.
 
 {{% info %}}
 A _minimal complete definition_ is a set of methods describing an
@@ -113,7 +113,7 @@ However the `size` function derived above is problematic. It takes
 structures maintains a size that can be obtained in constant time.
 Thus, for these data structures using the generalized `size` function incurs a
 prohibitively expensive overhead. In practice this means that our
-abstracted `size` function sadly isn't all too useful. But from the
+abstracted `size` function, sadly, isn't all too useful. But with the
 Fantasy Land specification we can't do better.
 
 {{% info %}}
@@ -138,7 +138,7 @@ from implementing in a specialized way.
 The fact that Jabz specifies a lot more methods than Fantasy Land places
 an extra burden on implementations. Therefore these are meant to be
 created with support from the library. This makes it very convenient
-to implement abstractions.
+to implement the abstractions.
 
 Jabz achieves this by offering functions that take classes and ensures
 that they have the necessary methods. These functions only require
@@ -173,15 +173,16 @@ Fantasy Land monoids must have the two methods `empty` and `concat`.
 These names make sense for the list instance of monoid where `empty`
 gives the empty list and `concat` does list concatenation. However, for
 other instances they are very awkward. One example is the `Max` monoid
-whose elements are number and where infinity is the identity element
+whose elements are numbers and where infinity is the identity element
 and the merge operation returns the minimum of two numbers. In this
 case `empty` is a very counterintuitive name for a function that
 returns infinity.
 
 In Jabz the monoid methods are instead called `identity` and
-`combine`. These names are just as abstract as the concept monoid
-itself. This ensures that no specific instances of Monoid ends up with
-non-intuitive names.
+`combine`. These names should be fairly easy to understand while
+ensuring that no specific instances of Monoid ends up with
+non-intuitive names. The idea is that abstract concepts should have
+abstract names.
 
 ## Speedy applicatives
 
@@ -205,23 +206,23 @@ might work like this:
 lift(f, a, b, c);
 ```
 
-However, there is a problem with this. Let's say `f` is any function
-taking `n` arguments. If we only have the methods `ap` and `of`, there
-is no way to apply `f` to `n` applicatives without currying `f` and
-calling the curried function `n` times. This hurts performance pretty
-badly. In most cases it may not matter. But why have applicatives with
-an unnecessary performance overhead?
+However, there is a problem here. Let's say `f` is any function taking
+`n` arguments. If we only have the methods `ap` and `of`, there is no
+way to apply `f` to `n` applicatives without currying `f` and calling
+the curried function `n` times. This hurts performance pretty badly.
+In most cases it may not matter. But why have applicatives with an
+unnecessary performance overhead?
 
-Unpleased with the situation, Jabz requires applicatives to bring their
-own `lift` method. But `lift` can be derived, so if they don't they
-will be given the default slow one. This has the significant advantage
-that for a specific structure it is often easy to implement `lift` so
-that the function to lift does not have to be curried and is only
-applied once.
+Unplaced with the situation, Jabz allows applicatives to bring their
+own `lift` method. `lift` can be derived, so if they don't they will
+be given the default slow one. This has the significant advantage that
+for a specific structure it is often easy to implement `lift` so that
+the function to lift does not have to be curried and is only applied
+once.
 
 To see what the difference can be in practice I've created a small
 benchmark that compares lifting a function over Jabz's `Maybe` with
-`lift` and with `ap`.
+`lift` and with `ap`. [The source code can be found here](https://github.com/Funkia/jabz/blob/master/benchmark/aplift.suite.js).
 
 ```bash
 -------------------- `ap` vs `lift` on `Maybe` --------------------
@@ -362,10 +363,11 @@ ideas to the table. Especially in terms of creating low-overhead
 abstractions with as many features as one can squeeze out of the them.
 
 Jabz is still far from finished. As a specification Fantasy Land is
-more comprehensive. Jabz currently only specify functor, applicative,
-monad, foldable and traversable. And while it does provide both a
-healthy set of utility function for working with the abstractions and
-some commonly used implementations of the specification there is still
-a lot to add.
+more comprehensive. Jabz currently only specifies functor,
+applicative, monad, foldable and traversable. And while it does
+provide both a healthy set of utility function for working with the
+abstractions and some commonly used implementations of the
+specification there is still a lot to add. Contributions and feedback
+is much appreciated.
 
 The library can [be found on Gitub](https://github.com/Funkia/jabz).
