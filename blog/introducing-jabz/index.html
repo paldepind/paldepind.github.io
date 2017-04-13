@@ -141,7 +141,7 @@ building on top of this single method, we can create many more. For
 instance, we can derive a function for getting the number of elements in
 any foldable.</p>
 <div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span></span><span class="kd">function</span> <span class="nx">size</span><span class="p">(</span><span class="nx">foldable</span><span class="p">)</span> <span class="p">{</span>
-  <span class="k">return</span> <span class="nx">foldable</span><span class="p">.</span><span class="nx">foldr</span><span class="p">((</span><span class="nx">n</span><span class="p">,</span> <span class="nx">m</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="nx">n</span> <span class="o">+</span> <span class="nx">m</span><span class="p">,</span> <span class="mi">0</span><span class="p">);</span>
+  <span class="k">return</span> <span class="nx">foldable</span><span class="p">.</span><span class="nx">foldr</span><span class="p">((</span><span class="nx">n</span><span class="p">,</span> <span class="nx">m</span><span class="p">)</span> <span class="p">=&gt;</span> <span class="nx">n</span> <span class="o">+</span> <span class="nx">m</span><span class="p">,</span> <span class="mi">0</span><span class="p">);</span>
 <span class="p">}</span>
 </code></pre></div>
 
@@ -277,8 +277,8 @@ once.</p>
 benchmark that compares lifting a function over Jabz&rsquo;s <code>Maybe</code> with
 <code>lift</code> and with <code>ap</code>. <a href="https://github.com/Funkia/jabz/blob/master/benchmark/aplift.suite.js">The source code can be found here</a>.</p>
 <div class="highlight"><pre><code class="language-bash" data-lang="bash"><span></span>-------------------- <span class="sb">`</span>ap<span class="sb">`</span> vs <span class="sb">`</span>lift<span class="sb">`</span> on <span class="sb">`</span>Maybe<span class="sb">`</span> --------------------
-lift                        9150491.49 op/s ±  4.45%   <span class="o">(</span><span class="m">68</span> samples<span class="o">)</span>
-ap                          1665864.27 op/s ±  1.31%   <span class="o">(</span><span class="m">85</span> samples<span class="o">)</span>
+lift                        <span class="m">9150491</span>.49 op/s ±  <span class="m">4</span>.45%   <span class="o">(</span><span class="m">68</span> samples<span class="o">)</span>
+ap                          <span class="m">1665864</span>.27 op/s ±  <span class="m">1</span>.31%   <span class="o">(</span><span class="m">85</span> samples<span class="o">)</span>
 ---------------------------- Best: lift ----------------------------
 </code></pre></div>
 
@@ -363,7 +363,7 @@ lost to the fact that JavaScript isn&rsquo;t lazy.</p>
 
 <p>Consider the aforementioned <code>find</code>.</p>
 <div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span></span><span class="kd">function</span> <span class="nx">find</span><span class="p">(</span><span class="nx">predicate</span><span class="p">,</span> <span class="nx">foldable</span><span class="p">)</span> <span class="p">{</span>
-  <span class="k">return</span> <span class="nx">foldable</span><span class="p">.</span><span class="nx">foldr</span><span class="p">((</span><span class="nx">e</span><span class="p">,</span> <span class="nx">a</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="nx">predicate</span><span class="p">(</span><span class="nx">e</span><span class="p">)</span> <span class="o">?</span> <span class="nx">just</span><span class="p">(</span><span class="nx">e</span><span class="p">)</span> <span class="o">:</span> <span class="nx">a</span><span class="p">,</span> <span class="nx">nothing</span><span class="p">());</span>
+  <span class="k">return</span> <span class="nx">foldable</span><span class="p">.</span><span class="nx">foldr</span><span class="p">((</span><span class="nx">e</span><span class="p">,</span> <span class="nx">a</span><span class="p">)</span> <span class="p">=&gt;</span> <span class="nx">predicate</span><span class="p">(</span><span class="nx">e</span><span class="p">)</span> <span class="o">?</span> <span class="nx">just</span><span class="p">(</span><span class="nx">e</span><span class="p">)</span> <span class="o">:</span> <span class="nx">a</span><span class="p">,</span> <span class="nx">nothing</span><span class="p">());</span>
 <span class="p">}</span>
 </code></pre></div>
 
@@ -388,7 +388,7 @@ are <code>find</code>, <code>findLast</code>, <code>take</code> and <code>any</c
 <p>Additionally, this also means that infinite data structures can be used
 with Jabz&rsquo;s foldable. In fact, Jabz ships with a simple infinite lazy
 list.</p>
-<div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span></span><span class="nx">take</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="nx">map</span><span class="p">((</span><span class="nx">n</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="nx">n</span> <span class="o">*</span> <span class="nx">n</span><span class="p">),</span> <span class="nx">naturals</span><span class="p">);</span> <span class="c1">//=&gt; [0, 1, 4, 9, 16]</span>
+<div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span></span><span class="nx">take</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="nx">map</span><span class="p">((</span><span class="nx">n</span><span class="p">)</span> <span class="p">=&gt;</span> <span class="nx">n</span> <span class="o">*</span> <span class="nx">n</span><span class="p">),</span> <span class="nx">naturals</span><span class="p">);</span> <span class="c1">//=&gt; [0, 1, 4, 9, 16]</span>
 </code></pre></div>
 
 <p>Here <code>naturals</code> is an infinite list of the natural numbers. First we

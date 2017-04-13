@@ -2,6 +2,11 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   
   <url>
+    <loc>http://vindum.io/blog/lets-reinvent-frp</loc>
+    <lastmod>2017-02-18T14:25:45+01:00</lastmod>
+  </url>
+  
+  <url>
     <loc>http://vindum.io/blog/introducing-jabz</loc>
     <lastmod>2017-01-04T14:25:45+01:00</lastmod>
   </url>
@@ -23,14 +28,26 @@
   </url>
   
   <url>
+    <loc>http://vindum.io/tags/frp/</loc>
+    <lastmod>2017-02-18T14:25:45+01:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>http://vindum.io/tags/functional-reactive-programming/</loc>
+    <lastmod>2017-02-18T14:25:45+01:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
     <loc>http://vindum.io/tags/javascript/</loc>
-    <lastmod>2017-01-04T14:25:45+01:00</lastmod>
+    <lastmod>2017-02-18T14:25:45+01:00</lastmod>
     <priority>0</priority>
   </url>
   
   <url>
     <loc>http://vindum.io/post/</loc>
-    <lastmod>2017-01-04T14:25:45+01:00</lastmod>
+    <lastmod>2017-02-18T14:25:45+01:00</lastmod>
     <priority>0</priority>
   </url>
   
@@ -40,14 +57,14 @@
   </url>
   
   <url>
-    <loc>http://vindum.io/</loc>
-    <lastmod>2017-01-04T14:25:45+01:00</lastmod>
+    <loc>http://vindum.io/tags/typescript/</loc>
+    <lastmod>2017-02-18T14:25:45+01:00</lastmod>
     <priority>0</priority>
   </url>
   
   <url>
-    <loc>http://vindum.io/categories/x/</loc>
-    <lastmod>2017-01-02T14:36:52+01:00</lastmod>
+    <loc>http://vindum.io/</loc>
+    <lastmod>2017-02-18T14:25:45+01:00</lastmod>
     <priority>0</priority>
   </url>
   
@@ -58,13 +75,19 @@
   </url>
   
   <url>
-    <loc>http://vindum.io/categories/y/</loc>
+    <loc>http://vindum.io/categories/x/</loc>
     <lastmod>2017-01-02T14:36:52+01:00</lastmod>
     <priority>0</priority>
   </url>
   
   <url>
     <loc>http://vindum.io/tags/y/</loc>
+    <lastmod>2017-01-02T14:36:52+01:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>http://vindum.io/categories/y/</loc>
     <lastmod>2017-01-02T14:36:52+01:00</lastmod>
     <priority>0</priority>
   </url>

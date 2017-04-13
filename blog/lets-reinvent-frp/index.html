@@ -1,0 +1,723 @@
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+    <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="generator" content="Hugo 0.18.1" />
+
+
+<title>Let&#39;s reinvent FRP - Vindum</title>
+<meta property="og:title" content="Let&#39;s reinvent FRP - Vindum">
+
+
+
+  
+
+
+
+
+
+
+<link rel="stylesheet" href="http://vindum.io/css/main.css" media="all">
+<link rel="stylesheet" href="//fonts.googleapis.com/css?family=Merriweather:400|Lato:400,400italic,700">
+<link href="https://fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet">
+
+  </head>
+  <body>
+    <div class="wrapper">
+      <header class="header">
+        <nav class="nav">
+  
+
+  <ul class="nav-links">
+    
+    <li><a href="/">Posts</a></li>
+    
+    <li><a href="https://github.com/paldepind">GitHub</a></li>
+    
+    <li><a href="https://twitter.com/paldepind">Twitter</a></li>
+    
+  </ul>
+</nav>
+
+      </header>
+
+
+<main class="content" role="main">
+
+  <article class="article">
+    
+    <span class="article-duration">17 min read</span>
+    
+
+    <h1 class="article-title">DRAFT - Let&#39;s reinvent FRP</h1>
+
+    
+    <span class="article-date">February 18, 2017</span>
+    
+
+    <div class="article-content">
+      
+
+<!--
+
+# Outline
+
+* Introduction
+  Why is FRP interesting
+* Our goal
+  What do we want from FRP?
+* Thinking like Conal
+  Explain denotational design.
+* Time changing values
+  Introduce behavior
+* Implementing behavior
+  Implement behavior and lift
+* Bending time
+  Showcase delay and slower
+* Reactivity
+  Explain why stream is needed and define it.
+* Combining behaviors and streams
+  Explain stepper and switcher
+* Stateful behaviors
+  Explain stateful behaviors and introduce `scan`
+* Conclusion
+  Recap of what was learned and about how awesome FRP is.
+
+What is functional reactive programming
+
+# Outline
+
+* The mission
+  Many modern takes on FRP has been said to miss the point.
+* The goal
+  Describe what problem we wish to solve with FRP.
+* Thinking like Conal
+
+Old outline.
+
+* Introduction
+  * Sell FRP and describe what problem it solves.
+  * Describe what this blog post will explain and why it is needed.
+  * Why FRP matters
+  * FRP is misunderstood
+  * It's elegant and powerful
+  * It changed my perspective on simplicity
+* Behavior and event
+  * Explain with implementation
+  * Why both are necessary
+  * Mouse movement is not events
+* A few combinators
+  * What can be do with FRP
+  * Implementations
+* Semantic design
+  * Simplicity
+* Continuous times
+  * Example of some sort
+  * Gives us nice properties
+* Further reading
+  * Conal Elliot papers
+-->
+
+<h2 id="introduction">Introduction</h2>
+
+<p>In this blog post we will set out on a journey to reinvent <em>functional
+reactive programming</em>. FRP is an elegant and powerful way to express
+interactive programs in a purely functional way. More than that, it
+embodies an approach to library design called <em>denotational design</em>
+that has utility way beyond FRP. The technique is both brilliant and
+very different from how most developers think about library design.</p>
+
+<p>Many modern libraries aim to solve the same problem that FRP did. But
+most of them don&rsquo;t do it as elegantly as FRP, missing the insights
+present in FRP. I think part of the reason is that most information
+about FRP is only to be found in academic papers. To remedy the
+situation I will, in this blog post, do my best to explain the
+fundamentals of FRP in an approachable fashion.</p>
+
+<p>We will go back to the roots of FRP to figure out what it is really
+about. We will see what problem FRP was made to solve and how it
+solves it. To do so we will consider the underlying principles behind
+its design. Along the way we will also implement a very simple FRP
+library in TypeScript.</p>
+
+<h2 id="our-goal">Our goal</h2>
+
+<p>The &ldquo;functional&rdquo; in FRP means <em>purely</em> functional declarative
+programming. The &ldquo;reactive&rdquo; means that we want to write programs that
+react to user input—like mouse movement and keyboard presses. What the
+name FRP does not capture, however, is that FRP is also inherently
+about <em>time</em>.</p>
+
+<p>When writing interactive programs we have to deal with a lot of
+quantities that change while the program is running. For instance, if
+we want to display an animation, the position of the shapes in the
+animation will have to change. With imperative programming this is
+most often achieved by directly changing variables as in this example.</p>
+<div class="highlight"><pre><code class="language-js" data-lang="js"><span></span><span class="kd">let</span> <span class="nx">x</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+<span class="kd">function</span> <span class="nx">mainLoop</span><span class="p">()</span> <span class="p">{</span>
+  <span class="nx">x</span> <span class="o">+=</span> <span class="mi">1</span><span class="p">;</span> <span class="c1">// move one pixel to the right</span>
+  <span class="nx">render</span><span class="p">();</span> <span class="c1">// render a new frame</span>
+  <span class="nb">window</span><span class="p">.</span><span class="nx">requestAnimationFrame</span><span class="p">(</span><span class="nx">mainLoop</span><span class="p">);</span>
+<span class="p">}</span>
+</code></pre></div>
+
+<p>Here <code>x</code> changes as time progresses. This technique is inherently
+imperative. The program above is a sequence of steps that <em>does</em>
+things in order to achieve the animation. Functional programming, on
+the other hand, is about <em>being</em> and not about doing. We want a pure
+way to declare what <code>x</code> actually is—a value that changes over time.
+The above code only captures this indirectly through the imperative
+steps that are carried out.</p>
+
+<p>We want a purely functional way of expressing programs like the one
+above. Programs with values that change over time and that react to
+input from the user. That is what FRP gives us.</p>
+
+<h2 id="thinking-like-conal">Thinking like Conal</h2>
+
+<p>FRP was invented by Conal Elliott. So to reinvent it properly we
+should understand how Conal thinks when he designs libraries.
+Fortunately, he has been kind enough to describe this on several
+occasions.</p>
+
+<p>Conal uses a process that he calls <em>denotational design</em>. The
+technique is radically different from the way most programmers
+approach software design. That may sound slightly frightening.
+Fortunately, it&rsquo;s actually a quite simple and a very clever idea.</p>
+
+<p>First, we must understand the following.</p>
+
+<div class="info-box">
+  <p>Any library is essentially about <em>things</em> and <em>operations</em> on these
+things.</p>
+
+</div>
+
+
+<p>In object-oriented programming things are represented as objects. They
+can be created with constructors. The operations we can manipulate
+them with are methods. In functional programming things are typically
+expressed as data types and the operations on them as pure functions.</p>
+
+<p>For instance the things a 3D library deals with might be three
+dimensional shapes. As operations it may provide ways to translate or
+rotate shapes. As another example, a database library handles things
+such as relations, queries and constraints. It provides operations
+construct queries and operations to carry them out on relations.</p>
+
+<p>Denotational design tells us that we should be precise about what the
+things our library talks about are. We do that by giving them a
+<em>meaning</em> (or semantic) in the form of a precise specification. The
+specification should satisfy three criteria</p>
+
+<ul>
+<li><em>Precision</em>. A vague specification is no good. Precision is achieved
+by associating the things in our code to mathematical objects.</li>
+<li><em>Simplicity</em>. The simpler the better. A simple specification ensures
+that the library is easy to understand and use. Implementation
+details should be kept out of the specification.</li>
+<li><em>Sufficiency</em>. All the operations that we&rsquo;d like our library to
+offer should be explainable based on the specification.</li>
+</ul>
+
+<p>We can break down the process of denotational design into three steps.</p>
+
+<ol>
+<li>Think about the things your library will work with and the
+operations it must support. Preferable this thinking should be on
+an intuitive level.</li>
+<li>Assign a meaning to the things the library will deal with. This
+specification should satisfy the criteria above to the extend
+possible.</li>
+<li>Implement the specification. Details of the implementation should
+be guided by the semantics. If you run into trouble you may have to
+revise the them.</li>
+</ol>
+
+<p>Let&rsquo;s see this process in action applied to the problem of designing
+functional interactive programs.</p>
+
+<h2 id="time-changing-values">Time changing values</h2>
+
+<p>Remember that we wanted a purely functional way of expressing things
+that change and reacts to input from the user.</p>
+
+<p>On an intuitive level we need a representation for values that can
+change as time passes. For instance we want to represent the position
+of a moving object as it changes over time. Let&rsquo;s call such a changing
+value a <em>behavior</em>.</p>
+
+<p>We have identified a <em>thing</em> which is step 1 in the process above.
+Step 2 is now to assign a meaning to the thing by associating it with
+a mathematical object. A behavior represents values that <em>depends</em> on
+time. The standard mathematical way of representing a value that
+depends on another value is as a <em>function</em>. And since behaviors
+represents values that change over time they should be a function from
+time.</p>
+
+<div class="info-box">
+  <p>A behavior is a function from time to a value.</p>
+
+</div>
+
+
+<p>We now have a new question. What is time? Time is another <em>thing</em>. So
+we need to apply step 1 and 2 to time as well. What is time at an
+intuitive level? There is past, present and the future. So time is
+one-dimensional. Also, time is a steady flow. It changes <em>all the
+time</em>. It is <em>continuous</em>. If we look for a mathematical object that
+satisfies this intuition we find the real numbers. So a point in time
+is a real number.</p>
+
+<h2 id="implementing-behavior">Implementing behavior</h2>
+
+<p>Let&rsquo;s make an attempt at step 3—implementation. When using
+denonational design the semantics suggests a very simple
+implementation. We can simply implement the semantics directly as
+code. That is often the quickest way to get started. It is, however,
+important to understand that we don&rsquo;t have to do that. The
+specification exists at a conceptual level. We can implement things
+any way we want as long as the implementation behaves as the semantics
+suggests.</p>
+
+<p>That is one of the benefits of denotational design. The specification
+offers a precise description of how the library should behave. It is
+high-level and free from technical details. These qualities gives a
+large amount of freedom to implementations while still serving as a
+measure of correctness.</p>
+
+<p>Let&rsquo;s first implement time. We don&rsquo;t have real numbers in
+TypeScript—only doubles. They&rsquo;re a pretty decent approximation though,
+so let&rsquo;s use them.</p>
+<div class="highlight"><pre><code class="language-ts" data-lang="ts"><span></span><span class="nx">type</span> <span class="nx">Time</span> <span class="o">=</span> <span class="kt">number</span><span class="p">;</span>
+</code></pre></div>
+
+<p>Next, define behavior to be a function from time.</p>
+<div class="highlight"><pre><code class="language-ts" data-lang="ts"><span></span><span class="nx">type</span> <span class="nx">Behavior</span><span class="o">&lt;</span><span class="nx">A</span><span class="o">&gt;</span> <span class="o">=</span> <span class="p">(</span><span class="nx">t</span>: <span class="kt">Time</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="nx">A</span><span class="p">;</span>
+</code></pre></div>
+
+<p>We have now established the types. What concrete behaviors can we
+think of? The simplest function I can think of is the identity
+function. The function that just returns its argument. The identity
+function is a behavior that always contains the current time.</p>
+<div class="highlight"><pre><code class="language-ts" data-lang="ts"><span></span><span class="nx">type</span> <span class="nx">timeB</span>: <span class="kt">Behavior</span><span class="o">&lt;</span><span class="nx">Time</span><span class="o">&gt;</span> <span class="o">=</span> <span class="p">(</span><span class="nx">t</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="nx">t</span><span class="p">;</span>
+</code></pre></div>
+
+<p>Another very simple group of functions are constant functions.
+Functions that don&rsquo;t look at their argument, but instead always
+returns the same value. Such functions are also behaviors.</p>
+<div class="highlight"><pre><code class="language-ts" data-lang="ts"><span></span><span class="kd">function</span> <span class="nx">constB</span><span class="o">&lt;</span><span class="nx">A</span><span class="o">&gt;</span><span class="p">(</span><span class="nx">a</span>: <span class="kt">A</span><span class="p">)</span><span class="o">:</span> <span class="nx">Behavior</span><span class="o">&lt;</span><span class="nx">A</span><span class="o">&gt;</span> <span class="p">{</span>
+  <span class="k">return</span> <span class="p">(</span><span class="nx">t</span>: <span class="kt">Time</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="nx">a</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div>
+
+<p><code>constB</code> takes a value and returns a behavior that has that value at
+any point in time. In a sense it is a behavior that doesn&rsquo;t use it&rsquo;s
+&ldquo;behavior-powers&rdquo; in any way.</p>
+
+<p>We now have a behavior of the current time and a way to create
+constant behaviors. The next thing to do is to define some operations
+on behaviors. That is, ways to combine existing behaviors into new
+behaviors.</p>
+
+<p>If one has a function from values of type <code>A</code> and a behavior of <code>A</code> it
+seems that it should possible to apply the function to the values
+inside the behavior. I.e., create a new behavior that for any point
+in time asks the original behavior for it value at that time, applies
+the function to the value, and returns the result. This can be
+implemented simply as function composition.</p>
+<div class="highlight"><pre><code class="language-ts" data-lang="ts"><span></span><span class="kd">function</span> <span class="nx">lift1</span><span class="o">&lt;</span><span class="nx">A</span><span class="p">,</span> <span class="nx">B</span><span class="o">&gt;</span><span class="p">(</span><span class="nx">f</span><span class="o">:</span> <span class="p">(</span><span class="nx">a</span>: <span class="kt">A</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="nx">B</span><span class="p">,</span> <span class="nx">a</span>: <span class="kt">Behavior</span><span class="o">&lt;</span><span class="nx">A</span><span class="o">&gt;</span><span class="p">)</span><span class="o">:</span> <span class="nx">Behavior</span><span class="o">&lt;</span><span class="nx">B</span><span class="o">&gt;</span> <span class="p">{</span>
+  <span class="k">return</span> <span class="p">(</span><span class="nx">t</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="nx">f</span><span class="p">(</span><span class="nx">a</span><span class="p">(</span><span class="nx">t</span><span class="p">));</span>
+<span class="p">}</span>
+</code></pre></div>
+
+<p>It gets a bit tedious, but we can do the same thing with functions
+taking more than one argument.</p>
+<div class="highlight"><pre><code class="language-ts" data-lang="ts"><span></span><span class="kd">function</span> <span class="nx">lift2</span><span class="o">&lt;</span><span class="nx">A</span><span class="p">,</span> <span class="nx">B</span><span class="p">,</span> <span class="nx">C</span><span class="o">&gt;</span><span class="p">(</span><span class="nx">f</span><span class="o">:</span> <span class="p">(</span><span class="nx">a</span>: <span class="kt">A</span><span class="p">,</span> <span class="nx">b</span>: <span class="kt">B</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="nx">C</span><span class="p">,</span> <span class="nx">a</span>: <span class="kt">Behavior</span><span class="o">&lt;</span><span class="nx">A</span><span class="o">&gt;</span><span class="p">,</span> <span class="nx">b</span>: <span class="kt">Behavior</span><span class="o">&lt;</span><span class="nx">B</span><span class="o">&gt;</span><span class="p">)</span> <span class="p">{</span>
+  <span class="k">return</span> <span class="p">(</span><span class="nx">t</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="nx">f</span><span class="p">(</span><span class="nx">a</span><span class="p">(</span><span class="nx">t</span><span class="p">),</span> <span class="nx">b</span><span class="p">(</span><span class="nx">t</span><span class="p">));</span>
+<span class="p">}</span>
+<span class="kd">function</span> <span class="nx">lift3</span><span class="o">&lt;</span><span class="nx">A</span><span class="p">,</span> <span class="nx">B</span><span class="p">,</span> <span class="nx">C</span><span class="p">,</span> <span class="nx">D</span><span class="o">&gt;</span><span class="p">(</span><span class="nx">f</span><span class="o">:</span> <span class="p">(</span><span class="nx">a</span>: <span class="kt">A</span><span class="p">,</span> <span class="nx">b</span>: <span class="kt">B</span><span class="p">,</span> <span class="nx">c</span>: <span class="kt">C</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="nx">D</span><span class="p">,</span> <span class="nx">a</span>: <span class="kt">Behavior</span><span class="o">&lt;</span><span class="nx">A</span><span class="o">&gt;</span><span class="p">,</span> <span class="nx">b</span>: <span class="kt">Behavior</span><span class="o">&lt;</span><span class="nx">B</span><span class="o">&gt;</span><span class="p">,</span> <span class="nx">c</span>: <span class="kt">Behavior</span><span class="o">&lt;</span><span class="nx">C</span><span class="o">&gt;</span><span class="p">)</span> <span class="p">{</span>
+  <span class="k">return</span> <span class="p">(</span><span class="nx">t</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="nx">f</span><span class="p">(</span><span class="nx">a</span><span class="p">(</span><span class="nx">t</span><span class="p">),</span> <span class="nx">b</span><span class="p">(</span><span class="nx">t</span><span class="p">),</span> <span class="nx">c</span><span class="p">(</span><span class="nx">t</span><span class="p">));</span>
+<span class="p">}</span>
+</code></pre></div>
+
+<p>This is TypeScript, and not Haskell. So, let&rsquo;s do the above with a
+more convenient variadic function instead.</p>
+<div class="highlight"><pre><code class="language-ts" data-lang="ts"><span></span><span class="kr">export</span> <span class="kd">function</span> <span class="nx">lift</span><span class="o">&lt;</span><span class="nx">A</span><span class="p">,</span> <span class="nx">B</span><span class="o">&gt;</span><span class="p">(</span><span class="nx">f</span><span class="o">:</span> <span class="p">(</span><span class="nx">a</span>: <span class="kt">A</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="nx">B</span><span class="p">,</span> <span class="nx">a</span>: <span class="kt">Behavior</span><span class="o">&lt;</span><span class="nx">A</span><span class="o">&gt;</span><span class="p">)</span><span class="o">:</span> <span class="nx">Behavior</span><span class="o">&lt;</span><span class="nx">B</span><span class="o">&gt;</span><span class="p">;</span>
+<span class="kr">export</span> <span class="kd">function</span> <span class="nx">lift</span><span class="o">&lt;</span><span class="nx">A</span><span class="p">,</span> <span class="nx">B</span><span class="p">,</span> <span class="nx">C</span><span class="o">&gt;</span><span class="p">(</span><span class="nx">f</span><span class="o">:</span> <span class="p">(</span><span class="nx">a</span>: <span class="kt">A</span><span class="p">,</span> <span class="nx">b</span>: <span class="kt">B</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="nx">C</span><span class="p">,</span> <span class="nx">a</span>: <span class="kt">Behavior</span><span class="o">&lt;</span><span class="nx">A</span><span class="o">&gt;</span><span class="p">,</span> <span class="nx">b</span>: <span class="kt">Behavior</span><span class="o">&lt;</span><span class="nx">B</span><span class="o">&gt;</span><span class="p">)</span><span class="o">:</span> <span class="nx">Behavior</span><span class="o">&lt;</span><span class="nx">C</span><span class="o">&gt;</span><span class="p">;</span>
+<span class="kr">export</span> <span class="kd">function</span> <span class="nx">lift</span><span class="o">&lt;</span><span class="nx">A</span><span class="p">,</span> <span class="nx">B</span><span class="p">,</span> <span class="nx">C</span><span class="p">,</span> <span class="nx">D</span><span class="o">&gt;</span><span class="p">(</span><span class="nx">f</span><span class="o">:</span> <span class="p">(</span><span class="nx">a</span>: <span class="kt">A</span><span class="p">,</span> <span class="nx">b</span>: <span class="kt">B</span><span class="p">,</span> <span class="nx">c</span>: <span class="kt">C</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="nx">D</span><span class="p">,</span> <span class="nx">a</span>: <span class="kt">Behavior</span><span class="o">&lt;</span><span class="nx">A</span><span class="o">&gt;</span><span class="p">,</span> <span class="nx">b</span>: <span class="kt">Behavior</span><span class="o">&lt;</span><span class="nx">B</span><span class="o">&gt;</span><span class="p">,</span> <span class="nx">c</span>: <span class="kt">Behavior</span><span class="o">&lt;</span><span class="nx">C</span><span class="o">&gt;</span><span class="p">)</span><span class="o">:</span> <span class="nx">Behavior</span><span class="o">&lt;</span><span class="nx">D</span><span class="o">&gt;</span><span class="p">;</span>
+<span class="kr">export</span> <span class="kd">function</span> <span class="nx">lift</span><span class="o">&lt;</span><span class="nx">A</span><span class="o">&gt;</span><span class="p">(</span><span class="nx">f</span><span class="o">:</span> <span class="p">(...</span><span class="nx">args</span>: <span class="kt">any</span><span class="p">[])</span> <span class="o">=&gt;</span> <span class="nx">A</span><span class="p">,</span> <span class="p">...</span><span class="nx">behaviors</span>: <span class="kt">Behavior</span><span class="o">&lt;</span><span class="nx">any</span><span class="o">&gt;</span><span class="p">[])</span><span class="o">:</span> <span class="nx">Behavior</span><span class="o">&lt;</span><span class="nx">A</span><span class="o">&gt;</span> <span class="p">{</span>
+  <span class="k">return</span> <span class="p">(</span><span class="nx">t</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="nx">f</span><span class="p">(...</span><span class="nx">behaviors</span><span class="p">.</span><span class="nx">map</span><span class="p">((</span><span class="nx">b</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="nx">b</span><span class="p">(</span><span class="nx">t</span><span class="p">)));</span>
+<span class="p">}</span>
+</code></pre></div>
+
+<p>Here I use TypeScript overloads to make the variadic function typesafe
+for up to three arguments.</p>
+
+<p>What we have so far is very simple. Still our behavior implementation
+is already powerful enough to express a simple animation.</p>
+<div class="highlight"><pre><code class="language-ts" data-lang="ts"><span></span><span class="nx">lift</span><span class="p">((</span><span class="nx">t</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="nx">circle</span><span class="p">(</span><span class="mi">20</span><span class="p">,</span> <span class="nx">t</span> <span class="o">*</span> <span class="mi">100</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="nx">timeB</span><span class="p">);</span>
+</code></pre></div>
+
+<p>Here <code>circle</code> is a function that takes a radius, an x-coordinate, a
+y-coordinate, and returns an image. We lift the function over <code>timeB</code>
+so the result is a behavior of a circle where the x-coordinate
+increases over time. When animated the above code looks like this.</p>
+
+<div id="animation0"></div>
+
+<p>Here is another little animation where I apply <code>sin</code> to the value from <code>timeB</code>.</p>
+<div class="highlight"><pre><code class="language-ts" data-lang="ts"><span></span><span class="nx">lift</span><span class="p">((</span><span class="nx">t</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="nx">circle</span><span class="p">(</span><span class="mi">20</span><span class="p">,</span> <span class="nx">t</span> <span class="o">*</span> <span class="mi">100</span> <span class="o">-</span> <span class="mi">260</span><span class="p">,</span> <span class="mi">50</span> <span class="o">*</span> <span class="nb">Math</span><span class="p">.</span><span class="nx">sin</span><span class="p">(</span><span class="mi">3</span> <span class="o">*</span> <span class="nx">t</span><span class="p">)),</span> <span class="nx">timeB</span><span class="p">);</span>
+</code></pre></div>
+
+<div id="animation1"></div>
+
+<p>In these examples, animations that depends on input from the outside
+world will be represented as functions from a world object to a
+behavior. The world object contains a special behavior called <code>mouse</code>.
+<code>mouse</code> is a behavior of the current position of the mouse. Below is a
+demonstration of this with a circle that follows the mouse.</p>
+<div class="highlight"><pre><code class="language-ts" data-lang="ts"><span></span><span class="kd">function</span> <span class="nx">animation2</span><span class="p">(</span><span class="nx">world</span>: <span class="kt">World</span><span class="p">)</span><span class="o">:</span> <span class="nx">Behavior</span><span class="o">&lt;</span><span class="nx">Image</span><span class="o">&gt;</span> <span class="p">{</span>
+  <span class="k">return</span> <span class="nx">lift</span><span class="p">(({</span><span class="nx">x</span><span class="p">,</span> <span class="nx">y</span><span class="p">})</span> <span class="o">=&gt;</span> <span class="nx">circle</span><span class="p">(</span><span class="mi">20</span><span class="p">,</span> <span class="nx">x</span><span class="p">,</span> <span class="nx">y</span><span class="p">),</span> <span class="nx">world</span><span class="p">.</span><span class="nx">mouse</span><span class="p">);</span>
+<span class="p">}</span>
+</code></pre></div>
+
+<div id="animation2"></div>
+
+<h2 id="bending-time">Bending time</h2>
+
+<p>Our behaviors now has one of the core features that we desired. They
+can represent changing values in a purely functional way. It would be
+interesting to explore what else we can do with them. To this end the
+semantics can serve as a guide.</p>
+
+<p>A behavior is a function from time. Thus, if we have a behavior we
+could transform it by wrapping it inside a new function from time.
+This wrapping function could transform the time parameter before
+passing it on to the wrapped behavior. By following that thought we
+can implement the following combinators.</p>
+<div class="highlight"><pre><code class="language-ts" data-lang="ts"><span></span><span class="kd">function</span> <span class="nx">delay</span><span class="o">&lt;</span><span class="nx">A</span><span class="o">&gt;</span><span class="p">(</span><span class="nx">delta</span>: <span class="kt">Time</span><span class="p">,</span> <span class="nx">b</span>: <span class="kt">Behavior</span><span class="o">&lt;</span><span class="nx">A</span><span class="o">&gt;</span><span class="p">)</span><span class="o">:</span> <span class="nx">Behavior</span><span class="o">&lt;</span><span class="nx">A</span><span class="o">&gt;</span> <span class="p">{</span>
+  <span class="k">return</span> <span class="p">(</span><span class="nx">t</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="nx">b</span><span class="p">(</span><span class="nx">t</span> <span class="o">-</span> <span class="nx">delta</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="kd">function</span> <span class="nx">slower</span><span class="o">&lt;</span><span class="nx">V</span><span class="o">&gt;</span><span class="p">(</span><span class="nx">n</span>: <span class="kt">number</span><span class="p">,</span> <span class="nx">b</span>: <span class="kt">Behavior</span><span class="o">&lt;</span><span class="nx">V</span><span class="o">&gt;</span><span class="p">)</span><span class="o">:</span> <span class="nx">Behavior</span><span class="o">&lt;</span><span class="nx">V</span><span class="o">&gt;</span> <span class="p">{</span>
+  <span class="k">return</span> <span class="p">(</span><span class="nx">t</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="nx">b</span><span class="p">(</span><span class="nx">t</span> <span class="o">/</span> <span class="nx">n</span><span class="p">);</span>
+<span class="p">}</span>
+</code></pre></div>
+
+<p><code>delay</code> takes a amount of time and a behavior. It then returns a new
+behavior that is identical to the original behavior except being
+delayed in time. <code>slower</code> slows down a behavior by a given factor.</p>
+
+<p>Here is an animation that shows what these look like in practice. We
+create a behavior called <code>movingCircle</code>. This behavior describes a
+circle that moves along a sine curve. We then create new behaviors by
+delaying and slowing down the moving circle. This gives us several
+behaviors of circles that we combine with the <code>stack</code> function.
+<code>stack</code> takes a variable amount of circles as argument and combines
+them into one image of all the circles.</p>
+<div class="highlight"><pre><code class="language-ts" data-lang="ts"><span></span><span class="kd">function</span> <span class="nx">animation3</span><span class="p">(</span><span class="nx">w</span>: <span class="kt">World</span><span class="p">)</span><span class="o">:</span> <span class="nx">Behavior</span><span class="o">&lt;</span><span class="nx">Image</span><span class="o">&gt;</span> <span class="p">{</span>
+  <span class="kr">const</span> <span class="nx">movingCircle</span> <span class="o">=</span>
+    <span class="nx">lift</span><span class="p">((</span><span class="nx">t</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="nx">circle</span><span class="p">(</span><span class="mi">20</span><span class="p">,</span> <span class="nx">t</span> <span class="o">*</span> <span class="mi">100</span> <span class="o">-</span> <span class="mi">260</span><span class="p">,</span> <span class="mi">50</span> <span class="o">*</span> <span class="nb">Math</span><span class="p">.</span><span class="nx">sin</span><span class="p">(</span><span class="mi">3</span> <span class="o">*</span> <span class="nx">t</span><span class="p">)),</span> <span class="nx">timeB</span><span class="p">);</span>
+  <span class="k">return</span> <span class="nx">lift</span><span class="p">(</span><span class="nx">stack</span><span class="p">,</span>
+    <span class="nx">movingCircle</span><span class="p">,</span>
+    <span class="nx">delay</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nx">movingCircle</span><span class="p">),</span>
+    <span class="nx">slower</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="nx">movingCircle</span><span class="p">),</span>
+    <span class="nx">slower</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="nx">movingCircle</span><span class="p">)</span>
+  <span class="p">);</span>
+<span class="p">}</span>
+</code></pre></div>
+
+<div id="animation3"></div>
+
+<h2 id="streams">Streams</h2>
+
+<p>We can now express values that change over time. But, something is
+still missing. For instance, let&rsquo;s say we wanted the above animation
+to react when a user clicked with his mouse. We&rsquo;d need a way to
+express the clicks, and we can&rsquo;t do it with a behavior. Because, a
+behavior is a thing that has a value at all moments in time and mouse
+clicks aren&rsquo;t like that. They are events that occurs at specific
+moments in time.</p>
+
+<p>The above observation leads to the conclusion that our semantic model
+is not yet as powerful as we&rsquo;d want. Behavior needs a companion. A new
+thing that can represent phenomenon like mouse clicks. By thinking
+about the specifics of mouse clicks we can figure out what
+requirements we have for this thing. This is step 1 in semantic design
+process.</p>
+
+<ul>
+<li>There can be zero, one or many mouse clicks.</li>
+<li>Each mouse click happens at an exact discrete moment in time.</li>
+<li>Each mouse click has some associated data. Like where the mouse was
+pressed, etc.</li>
+</ul>
+
+<p>Step 2 is to find a semantic model that would satisfy the above. The
+first requirement indicates that we need some sort of collection. And
+since mouse clicks are ordered we could use a list. The second point
+hints that we should store the time of each click and to satisfy the
+third demand we should also store data along with each time point.</p>
+
+<p>This leads to the following semantic model.</p>
+
+<div class="info-box">
+  <p>A <em>stream</em> is a list of records where each record contains a time
+value and a data value. The records should be ordered increasingly by
+their time.</p>
+
+</div>
+
+
+<p>Since we are trying to keep things as simple as possible that will
+also be the way we implement streams. We can express the above with a
+type like this</p>
+<div class="highlight"><pre><code class="language-typescript" data-lang="typescript"><span></span><span class="nx">type</span> <span class="nx">Occurrence</span><span class="o">&lt;</span><span class="nx">A</span><span class="o">&gt;</span> <span class="o">=</span> <span class="p">{</span><span class="nx">time</span>: <span class="kt">Time</span><span class="p">,</span> <span class="nx">value</span>: <span class="kt">A</span><span class="p">};</span>
+<span class="nx">type</span> <span class="nx">Stream</span><span class="o">&lt;</span><span class="nx">A</span><span class="o">&gt;</span> <span class="o">=</span> <span class="nx">Occurrence</span><span class="o">&lt;</span><span class="nx">A</span><span class="o">&gt;</span><span class="p">[];</span>
+</code></pre></div>
+
+<p>Let&rsquo;s see what we can do with streams. We can map a function over a
+stream. That is, apply a function to the value in each occurrence.</p>
+<div class="highlight"><pre><code class="language-typescript" data-lang="typescript"><span></span><span class="kd">function</span> <span class="nx">map</span><span class="o">&lt;</span><span class="nx">A</span><span class="p">,</span> <span class="nx">B</span><span class="o">&gt;</span><span class="p">(</span><span class="nx">f</span><span class="o">:</span> <span class="p">(</span><span class="nx">a</span>: <span class="kt">A</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="nx">B</span><span class="p">,</span> <span class="nx">stream</span>: <span class="kt">Stream</span><span class="o">&lt;</span><span class="nx">A</span><span class="o">&gt;</span><span class="p">)</span><span class="o">:</span> <span class="nx">Stream</span><span class="o">&lt;</span><span class="nx">B</span><span class="o">&gt;</span> <span class="p">{</span>
+  <span class="k">return</span> <span class="nx">stream</span><span class="p">.</span><span class="nx">map</span><span class="p">(({</span><span class="nx">time</span><span class="p">,</span> <span class="nx">value</span><span class="p">})</span> <span class="o">=&gt;</span> <span class="p">({</span><span class="nx">time</span><span class="p">,</span> <span class="nx">value</span>: <span class="kt">f</span><span class="p">(</span><span class="nx">value</span><span class="p">)}));</span>
+<span class="p">}</span>
+</code></pre></div>
+
+<p>We can also filter occurrences.</p>
+<div class="highlight"><pre><code class="language-typescript" data-lang="typescript"><span></span><span class="kd">function</span> <span class="nx">filter</span><span class="o">&lt;</span><span class="nx">A</span><span class="o">&gt;</span><span class="p">(</span><span class="nx">predicate</span><span class="o">:</span> <span class="p">(</span><span class="nx">a</span>: <span class="kt">A</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="kr">boolean</span><span class="p">,</span> <span class="nx">stream</span>: <span class="kt">Stream</span><span class="o">&lt;</span><span class="nx">A</span><span class="o">&gt;</span><span class="p">)</span><span class="o">:</span> <span class="nx">Stream</span><span class="o">&lt;</span><span class="nx">A</span><span class="o">&gt;</span> <span class="p">{</span>
+  <span class="k">return</span> <span class="nx">stream</span><span class="p">.</span><span class="nx">filter</span><span class="p">(({</span><span class="nx">value</span><span class="p">})</span> <span class="o">=&gt;</span> <span class="nx">predicate</span><span class="p">(</span><span class="nx">value</span><span class="p">));</span>
+<span class="p">}</span>
+</code></pre></div>
+
+<p>Notice that while <code>map</code> on streams is similar to <code>lift1</code> on behavior.
+<code>filter</code>, on the other hand, only makes sense on streams.</p>
+
+<h2 id="combining-behaviors-and-streams">Combining behaviors and streams</h2>
+
+<p>Armed with behavior and stream we can represent both things that are
+continuous and things that are discrete.</p>
+
+<p>However, what if we wanted to implement an animation with a circle
+that always moves to the last position where the user clicked? Like
+this:</p>
+
+<div id="animation4"></div>
+
+<p>The position of the circle would be a behavior and the clicks a
+stream. To create the moving circle we&rsquo;d have to create a behavior
+based on the occurrences in the click stream.</p>
+
+<p>Looking at the example above we can see that the position has an
+initial value at the center of the image. It then switches every time
+a mouse click event occurs.</p>
+
+<p>We could turn the click stream into a behavior that &ldquo;steps&rdquo; from each
+event value to the next. At any point in time the behaviors value will
+be the value of the last event before that point in time. Below is an
+implementation of this function.</p>
+<div class="highlight"><pre><code class="language-ts" data-lang="ts"><span></span><span class="kd">function</span> <span class="nx">findOccurence</span><span class="o">&lt;</span><span class="nx">V</span><span class="o">&gt;</span><span class="p">(</span><span class="nx">t</span>: <span class="kt">Time</span><span class="p">,</span> <span class="nx">stream</span>: <span class="kt">Stream</span><span class="o">&lt;</span><span class="nx">V</span><span class="o">&gt;</span><span class="p">)</span><span class="o">:</span> <span class="nx">Occurrence</span><span class="o">&lt;</span><span class="nx">V</span><span class="o">&gt;</span> <span class="o">|</span> <span class="kc">undefined</span> <span class="p">{</span>
+  <span class="k">return</span> <span class="nx">stream</span><span class="p">.</span><span class="nx">reduce</span><span class="p">((</span><span class="nx">prev</span><span class="p">,</span> <span class="nx">occ</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="nx">occ</span><span class="p">.</span><span class="nx">time</span> <span class="o">&lt;</span> <span class="nx">t</span> <span class="o">?</span> <span class="nx">occ</span> : <span class="kt">prev</span><span class="p">,</span> <span class="kc">undefined</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="kd">function</span> <span class="nx">stepper</span><span class="o">&lt;</span><span class="nx">V</span><span class="o">&gt;</span><span class="p">(</span><span class="nx">initialValue</span>: <span class="kt">V</span><span class="p">,</span> <span class="nx">stream</span>: <span class="kt">Stream</span><span class="o">&lt;</span><span class="nx">V</span><span class="o">&gt;</span><span class="p">)</span><span class="o">:</span> <span class="nx">Behavior</span><span class="o">&lt;</span><span class="nx">V</span><span class="o">&gt;</span> <span class="p">{</span>
+  <span class="k">return</span> <span class="p">(</span><span class="nx">t</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
+    <span class="kr">const</span> <span class="nx">occ</span> <span class="o">=</span> <span class="nx">findOccurence</span><span class="p">(</span><span class="nx">t</span><span class="p">,</span> <span class="nx">stream</span><span class="p">);</span>
+    <span class="k">return</span> <span class="nx">occ</span> <span class="o">!==</span> <span class="kc">undefined</span> <span class="o">?</span> <span class="nx">occ.value</span> : <span class="kt">initialValue</span><span class="p">;</span>
+  <span class="p">};</span>
+<span class="p">}</span>
+</code></pre></div>
+
+<p>The function <code>stepper</code> takes an initial value, a stream, and returns a
+behavior. The returned behavior starts out with the initial value and
+steps through each occurrence value.</p>
+
+<p>With the help of the <code>stepper</code> function we can implement the above
+program like this</p>
+<div class="highlight"><pre><code class="language-ts" data-lang="ts"><span></span><span class="kd">function</span> <span class="nx">animation4</span><span class="p">(</span><span class="nx">world</span>: <span class="kt">World</span><span class="p">)</span><span class="o">:</span> <span class="nx">Behavior</span><span class="o">&lt;</span><span class="nx">Image</span><span class="o">&gt;</span> <span class="p">{</span>
+  <span class="k">return</span> <span class="nx">stepper</span><span class="p">(</span>
+    <span class="nx">circle</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
+    <span class="nx">map</span><span class="p">(({</span> <span class="nx">x</span><span class="p">,</span> <span class="nx">y</span> <span class="p">})</span> <span class="o">=&gt;</span> <span class="nx">circle</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="nx">x</span><span class="p">,</span> <span class="nx">y</span><span class="p">),</span> <span class="nx">world</span><span class="p">.</span><span class="nx">clicks</span><span class="p">)</span>
+  <span class="p">);</span>
+<span class="p">}</span>
+</code></pre></div>
+
+<p>Here I use the <code>clicks</code> stream that exists on the <code>world</code> object.</p>
+
+<p>Consider the signature of <code>stepper</code>.</p>
+<div class="highlight"><pre><code class="language-ts" data-lang="ts"><span></span><span class="o">&lt;</span><span class="nx">V</span><span class="o">&gt;</span><span class="p">(</span><span class="nx">initialValue</span>: <span class="kt">V</span><span class="p">,</span> <span class="nx">stream</span>: <span class="kt">Stream</span><span class="o">&lt;</span><span class="nx">V</span><span class="o">&gt;</span><span class="p">)</span><span class="o">:</span> <span class="nx">Behavior</span><span class="o">&lt;</span><span class="nx">V</span><span class="o">&gt;</span><span class="p">;</span>
+</code></pre></div>
+
+<p>What if we replaced the occurrences of <code>V</code> in the arguments with with
+<code>Behavior&lt;V&gt;</code>. Then we&rsquo;d get the following function signature</p>
+<div class="highlight"><pre><code class="language-ts" data-lang="ts"><span></span><span class="o">&lt;</span><span class="nx">V</span><span class="o">&gt;</span><span class="p">(</span><span class="nx">initialValue</span>: <span class="kt">Behavior</span><span class="o">&lt;</span><span class="nx">V</span><span class="o">&gt;</span><span class="p">,</span> <span class="nx">stream</span>: <span class="kt">Stream</span><span class="o">&lt;</span><span class="nx">Behavior</span><span class="o">&lt;</span><span class="nx">V</span><span class="o">&gt;&gt;</span><span class="p">)</span><span class="o">:</span> <span class="nx">Behavior</span><span class="o">&lt;</span><span class="nx">V</span><span class="o">&gt;</span><span class="p">;</span>
+</code></pre></div>
+
+<p>That is more powerful than <code>stepper</code> because a value of type
+<code>Behavior&lt;V&gt;</code> is more powerful than just <code>V</code>. Implementing this
+function is very similar to the implementation of <code>stepper</code>.</p>
+<div class="highlight"><pre><code class="language-ts" data-lang="ts"><span></span><span class="kr">export</span> <span class="kd">function</span> <span class="nx">switcher</span><span class="o">&lt;</span><span class="nx">V</span><span class="o">&gt;</span><span class="p">(</span><span class="nx">b</span>: <span class="kt">Behavior</span><span class="o">&lt;</span><span class="nx">V</span><span class="o">&gt;</span><span class="p">,</span> <span class="nx">e</span>: <span class="kt">Stream</span><span class="o">&lt;</span><span class="nx">Behavior</span><span class="o">&lt;</span><span class="nx">V</span><span class="o">&gt;&gt;</span><span class="p">)</span><span class="o">:</span> <span class="nx">Behavior</span><span class="o">&lt;</span><span class="nx">V</span><span class="o">&gt;</span> <span class="p">{</span>
+  <span class="k">return</span> <span class="p">(</span><span class="nx">t</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
+    <span class="kr">const</span>  <span class="nx">occ</span> <span class="o">=</span> <span class="nx">findOccurrence</span><span class="p">(</span><span class="nx">t</span><span class="p">,</span> <span class="nx">e</span><span class="p">);</span>
+    <span class="k">return</span> <span class="nx">occ</span> <span class="o">!==</span> <span class="kc">undefined</span> <span class="o">?</span> <span class="nx">occ</span><span class="p">.</span><span class="nx">value</span><span class="p">(</span><span class="nx">t</span><span class="p">)</span> <span class="o">:</span> <span class="nx">b</span><span class="p">(</span><span class="nx">t</span><span class="p">);</span>
+  <span class="p">};</span>
+<span class="p">}</span>
+</code></pre></div>
+
+<p>We can confirm that <code>switcher</code> is more powerful than <code>stepper</code> by
+observing that <code>stepper</code> can be implemented in terms of <code>switcher</code>.</p>
+<div class="highlight"><pre><code class="language-ts" data-lang="ts"><span></span><span class="kd">function</span> <span class="nx">stepper</span><span class="o">&lt;</span><span class="nx">V</span><span class="o">&gt;</span><span class="p">(</span><span class="nx">initialValue</span>: <span class="kt">V</span><span class="p">,</span> <span class="nx">stream</span>: <span class="kt">Stream</span><span class="o">&lt;</span><span class="nx">V</span><span class="o">&gt;</span><span class="p">)</span><span class="o">:</span> <span class="nx">Behavior</span><span class="o">&lt;</span><span class="nx">V</span><span class="o">&gt;</span> <span class="p">{</span>
+  <span class="k">return</span> <span class="nx">switcher</span><span class="p">(</span><span class="nx">constB</span><span class="p">(</span><span class="nx">initialValue</span><span class="p">),</span> <span class="nx">map</span><span class="p">(</span><span class="nx">constB</span><span class="p">,</span> <span class="nx">stream</span><span class="p">));</span>
+<span class="p">}</span>
+</code></pre></div>
+
+<p>This implies that <code>switcher</code> is more <em>essential</em> than <code>stepper</code>. If an
+FRP library only provided <code>switcher</code> we could easily derive <code>stepper</code>
+from it. But we cannot implement <code>switcher</code> from <code>stepper</code>.</p>
+
+<h2 id="stateful-behaviors">Stateful behaviors</h2>
+
+<p>Our FRP library now supports both stream, behaviors, and higher-order
+combinations of these. But, if we try to create anything beyond the
+simple animations that we&rsquo;ve seen so far we will eventually stumble
+into a problem where we will be stuck.</p>
+
+<p>Here is an example of one such problem: Define behavior of a circle
+where each time the user clicks with his mouse the size of the circle
+increases by a small amount.</p>
+
+<p>It sounds pretty simple. But we can&rsquo;t do it. The reason is that the
+described behavior is a <em>stateful behavior</em>.</p>
+
+<div class="info-box">
+  <p>A <em>stateful behavior</em> is behavior whose <em>current</em> value depends on the
+<em>past</em>.</p>
+
+</div>
+
+
+<p>The above behavior is stateful because the current size of the circle
+depends on how many times the mouse has been clicked <em>in the past</em>.</p>
+
+<p>To support that we need a combinator that makes it possible to
+remember the past. One such combinator is <code>scan</code>. <code>scan</code> works a bit
+like <code>reduce</code> on arrays. It takes a function of type <code>(a: A, B) =&gt; B</code>,
+an initial value of type <code>B</code> and a stream of type <code>Stream&lt;A&gt;</code>. It then
+returns a behavior that at any moment contains the result of folding
+the function over all the occurrences in the stream before that
+moment.</p>
+
+<p>We can implement <code>scan</code> like this</p>
+<div class="highlight"><pre><code class="language-ts" data-lang="ts"><span></span><span class="kd">function</span> <span class="nx">scan</span><span class="o">&lt;</span><span class="nx">A</span><span class="p">,</span> <span class="nx">B</span><span class="o">&gt;</span><span class="p">(</span>
+  <span class="nx">f</span><span class="o">:</span> <span class="p">(</span><span class="nx">a</span>: <span class="kt">A</span><span class="p">,</span> <span class="nx">b</span>: <span class="kt">B</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="nx">B</span><span class="p">,</span> <span class="nx">init</span>: <span class="kt">B</span><span class="p">,</span> <span class="nx">source</span>: <span class="kt">Stream</span><span class="o">&lt;</span><span class="nx">A</span><span class="o">&gt;</span>
+<span class="p">)</span><span class="o">:</span> <span class="nx">Behavior</span><span class="o">&lt;</span><span class="nx">B</span><span class="o">&gt;</span> <span class="p">{</span>
+  <span class="k">return</span> <span class="p">(</span><span class="nx">t</span>: <span class="kt">Time</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
+    <span class="kr">const</span> <span class="nx">occurrencesBeforeT</span> <span class="o">=</span> <span class="nx">source</span><span class="p">.</span><span class="nx">filter</span><span class="p">(({</span><span class="nx">time</span><span class="p">})</span> <span class="o">=&gt;</span> <span class="nx">time</span> <span class="o">&lt;</span> <span class="nx">t</span><span class="p">);</span>
+    <span class="kr">const</span> <span class="nx">values</span> <span class="o">=</span> <span class="nx">occurrencesBeforeT</span><span class="p">.</span><span class="nx">map</span><span class="p">(({</span><span class="nx">value</span><span class="p">})</span> <span class="o">=&gt;</span> <span class="nx">value</span><span class="p">);</span>
+    <span class="k">return</span> <span class="nx">values</span><span class="p">.</span><span class="nx">reduce</span><span class="p">((</span><span class="nx">b</span><span class="p">,</span> <span class="nx">a</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="nx">f</span><span class="p">(</span><span class="nx">a</span><span class="p">,</span> <span class="nx">b</span><span class="p">),</span> <span class="nx">init</span><span class="p">);</span>
+  <span class="p">};</span>
+<span class="p">}</span>
+</code></pre></div>
+
+<p>The implementation also shows the similarity with <code>reduce</code>. First we
+discard all occurrences from the stream that happens after <code>t</code>, then
+we extract the value from all the occurrences and finally we call
+<code>reduce</code> on the resulting array.</p>
+
+<p>With <code>scan</code> the behavior I described above can be implemented like
+this:</p>
+<div class="highlight"><pre><code class="language-ts" data-lang="ts"><span></span><span class="kd">function</span> <span class="nx">animation5</span><span class="p">(</span><span class="nx">w</span>: <span class="kt">World</span><span class="p">)</span><span class="o">:</span> <span class="nx">Behavior</span><span class="o">&lt;</span><span class="nx">Image</span><span class="o">&gt;</span> <span class="p">{</span>
+  <span class="kr">const</span> <span class="nx">size</span> <span class="o">=</span> <span class="nx">scan</span><span class="p">((</span><span class="nx">_</span><span class="p">,</span> <span class="nx">s</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="nx">s</span> <span class="o">+</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">110</span><span class="p">,</span> <span class="nx">w</span><span class="p">.</span><span class="nx">clicks</span><span class="p">);</span>
+  <span class="k">return</span> <span class="nx">lift</span><span class="p">((</span><span class="nx">s</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="nx">circle</span><span class="p">(</span><span class="nx">s</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="nx">size</span><span class="p">);</span>
+<span class="p">}</span>
+</code></pre></div>
+
+<p>And the result looks like this:</p>
+
+<div id="animation6"></div>
+
+<h2 id="conclusion">Conclusion</h2>
+
+<p>We have now implemented what is a fully featured FRP library with very
+little code.</p>
+
+<p>We have seen how we can achieve some very powerful constructs using
+simple semantics. Both behavior and stream are very simple compared to
+most implementations of streams and observables that you will find.</p>
+
+<p>This blog post has covered the fundamentals of FRP and the underlying
+goals and ideas. There is, however, a lot of things that didn&rsquo;t fit
+into this blog post.</p>
+
+<ul>
+<li>A deeper explanation about why it is beneficial to keep behavior and
+stream as two separate things.</li>
+<li>Why continuous time is beneficial. The semantics and implementation
+I introduced supports continuous time. But much more could be said
+about the importance of it.</li>
+<li>How to implement FRP in a practical way. The implementation in this
+blog post is in no way practical. It suffers from FRPs notorious
+problem with memory-leaks. Making higher-order FRP practical is
+possible but it adds a bit of complexity to the API and
+implementation.</li>
+</ul>
+
+<p>I may or may not cover these topics in further blog-posts.</p>
+
+<p>Finally, if this blog post has made you interested in FRP you may want
+to take a look at the following FRP implementations or check out the
+further reading below.</p>
+
+<ul>
+<li><a href="https://github.com/funkia/hareactive">Hareactive</a>. An FRP library
+written in TypeScript.</li>
+<li><a href="https://github.com/HeinrichApfelmus/reactive-banana/">Reactive
+Banana</a>. A FRP
+library written in Haskell that focuses on having simple semantics
+and an efficient implementation.</li>
+<li><a href="https://github.com/reflex-frp/reflex">Reflex</a>. A FRP library
+written in Haskell that aims to be as practical as possible. It also
+comes with a framework
+<a href="https://github.com/reflex-frp/reflex-dom">Reflex-DOM</a> that supports
+building web-apps with Reflex and GHCJS.</li>
+</ul>
+
+<h2 id="further-reading">Further reading</h2>
+
+<p>Below is are a few selected references that you may read if you desire more
+information about the topics covered in this blog post.</p>
+
+<ul>
+<li>FIXME</li>
+<li>TODO</li>
+<li>Links to papers</li>
+</ul>
+
+<p><script src="/bundle.js"></script>
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet"></p>
+
+    </div>
+  </article>
+
+  
+
+</main>
+
+      <footer class="footer">
+        <ul class="footer-links">
+          <li>
+            <a href="http://vindum.io/index.xml" type="application/rss+xml" target="_blank">RSS feed</a>
+          </li>
+          <li>
+            <a href="https://gohugo.io/" class="footer-links-kudos">Made with <img src="http://vindum.io/images/hugo-logo.png" width="22" height="22"></a>
+          </li>
+        </ul>
+      </footer>
+
+    </div>
+
+    
+  </body>
+</html>
+
