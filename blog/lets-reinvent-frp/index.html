@@ -50,7 +50,7 @@
     <span class="article-duration">17 min read</span>
     
 
-    <h1 class="article-title">DRAFT - Let&#39;s reinvent FRP</h1>
+    <h1 class="article-title">Let&#39;s reinvent FRP</h1>
 
     
     <span class="article-date">February 18, 2017</span>
@@ -60,7 +60,7 @@
       
 
 <!--
-
+ 
 # Outline
 
 * Introduction
@@ -232,7 +232,7 @@ specification should satisfy the criteria above to the extend
 possible.</li>
 <li>Implement the specification. Details of the implementation should
 be guided by the semantics. If you run into trouble you may have to
-revise the them.</li>
+revise them.</li>
 </ol>
 
 <p>Let&rsquo;s see this process in action applied to the problem of designing
@@ -602,11 +602,11 @@ depends on how many times the mouse has been clicked <em>in the past</em>.</p>
 
 <p>To support that we need a combinator that makes it possible to
 remember the past. One such combinator is <code>scan</code>. <code>scan</code> works a bit
-like <code>reduce</code> on arrays. It takes a function of type <code>(a: A, B) =&gt; B</code>,
-an initial value of type <code>B</code> and a stream of type <code>Stream&lt;A&gt;</code>. It then
-returns a behavior that at any moment contains the result of folding
-the function over all the occurrences in the stream before that
-moment.</p>
+like <code>reduce</code> on arrays. It takes a function of type <code>(a: A, b: b) =&gt;
+B</code>, an initial value of type <code>B</code> and a stream of type <code>Stream&lt;A&gt;</code>. It
+then returns a behavior that at any moment contains the result of
+folding the function over all the occurrences in the stream before
+that moment.</p>
 
 <p>We can implement <code>scan</code> like this</p>
 <div class="highlight"><pre><code class="language-ts" data-lang="ts"><span></span><span class="kd">function</span> <span class="nx">scan</span><span class="o">&lt;</span><span class="nx">A</span><span class="p">,</span> <span class="nx">B</span><span class="o">&gt;</span><span class="p">(</span>

@@ -17,7 +17,7 @@
       <description>
 
 &lt;!--
-
+ 
 # Outline
 
 * Introduction
@@ -189,7 +189,7 @@ specification should satisfy the criteria above to the extend
 possible.&lt;/li&gt;
 &lt;li&gt;Implement the specification. Details of the implementation should
 be guided by the semantics. If you run into trouble you may have to
-revise the them.&lt;/li&gt;
+revise them.&lt;/li&gt;
 &lt;/ol&gt;
 
 &lt;p&gt;Let&amp;rsquo;s see this process in action applied to the problem of designing
@@ -559,11 +559,11 @@ depends on how many times the mouse has been clicked &lt;em&gt;in the past&lt;/e
 
 &lt;p&gt;To support that we need a combinator that makes it possible to
 remember the past. One such combinator is &lt;code&gt;scan&lt;/code&gt;. &lt;code&gt;scan&lt;/code&gt; works a bit
-like &lt;code&gt;reduce&lt;/code&gt; on arrays. It takes a function of type &lt;code&gt;(a: A, B) =&amp;gt; B&lt;/code&gt;,
-an initial value of type &lt;code&gt;B&lt;/code&gt; and a stream of type &lt;code&gt;Stream&amp;lt;A&amp;gt;&lt;/code&gt;. It then
-returns a behavior that at any moment contains the result of folding
-the function over all the occurrences in the stream before that
-moment.&lt;/p&gt;
+like &lt;code&gt;reduce&lt;/code&gt; on arrays. It takes a function of type &lt;code&gt;(a: A, b: b) =&amp;gt;
+B&lt;/code&gt;, an initial value of type &lt;code&gt;B&lt;/code&gt; and a stream of type &lt;code&gt;Stream&amp;lt;A&amp;gt;&lt;/code&gt;. It
+then returns a behavior that at any moment contains the result of
+folding the function over all the occurrences in the stream before
+that moment.&lt;/p&gt;
 
 &lt;p&gt;We can implement &lt;code&gt;scan&lt;/code&gt; like this&lt;/p&gt;
 &lt;div class=&#34;highlight&#34;&gt;&lt;pre&gt;&lt;code class=&#34;language-ts&#34; data-lang=&#34;ts&#34;&gt;&lt;span&gt;&lt;/span&gt;&lt;span class=&#34;kd&#34;&gt;function&lt;/span&gt; &lt;span class=&#34;nx&#34;&gt;scan&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&#34;nx&#34;&gt;A&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;nx&#34;&gt;B&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;&amp;gt;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;
