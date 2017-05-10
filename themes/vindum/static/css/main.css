@@ -91,7 +91,7 @@ a {
   padding: 0 15px;
   font-size: 16px;
   line-height: 1.7;
-  color: #555;
+  color: #444;
 }
 
 .article-title {
@@ -119,6 +119,10 @@ a {
 
 .article-content p {
   margin: 25px 0 25px;
+}
+
+.article-content img {
+  width: 100%;
 }
 
 .article-content a {
@@ -292,7 +296,7 @@ code {
   }
 
   .content {
-    font-size: 19px;
+    font-size: 18px;
     line-height: 1.8;
     margin: 100px auto;
   }
