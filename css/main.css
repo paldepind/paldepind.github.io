@@ -121,6 +121,10 @@ a {
   margin: 25px 0 25px;
 }
 
+.article-content img {
+  width: 100%;
+}
+
 .article-content a {
   text-decoration: none;
   color: inherit;
@@ -292,9 +296,13 @@ code {
   }
 
   .content {
-    font-size: 18px;
+    font-size: 17px;
     line-height: 1.8;
     margin: 100px auto;
+  }
+
+  .article-content p {
+    text-align: justify;
   }
 
   .highlight {

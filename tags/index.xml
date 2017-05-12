@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Tags on Vindum</title>
+    <link>http://vindum.io/tags/</link>
+    <description>Recent content in Tags on Vindum</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <lastBuildDate>Fri, 12 May 2017 14:25:45 +0100</lastBuildDate>
+    
+	<atom:link href="http://vindum.io/tags/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>Behavior</title>
+      <link>http://vindum.io/tags/behavior/</link>
+      <pubDate>Fri, 12 May 2017 14:25:45 +0100</pubDate>
+      
+      <guid>http://vindum.io/tags/behavior/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Frp</title>
+      <link>http://vindum.io/tags/frp/</link>
+      <pubDate>Fri, 12 May 2017 14:25:45 +0100</pubDate>
+      
+      <guid>http://vindum.io/tags/frp/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Functional Reactive Programming</title>
+      <link>http://vindum.io/tags/functional-reactive-programming/</link>
+      <pubDate>Fri, 12 May 2017 14:25:45 +0100</pubDate>
+      
+      <guid>http://vindum.io/tags/functional-reactive-programming/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Javascript</title>
+      <link>http://vindum.io/tags/javascript/</link>
+      <pubDate>Fri, 12 May 2017 14:25:45 +0100</pubDate>
+      
+      <guid>http://vindum.io/tags/javascript/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Typescript</title>
+      <link>http://vindum.io/tags/typescript/</link>
+      <pubDate>Fri, 12 May 2017 14:25:45 +0100</pubDate>
+      
+      <guid>http://vindum.io/tags/typescript/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>X</title>
+      <link>http://vindum.io/tags/x/</link>
+      <pubDate>Mon, 02 Jan 2017 14:36:52 +0100</pubDate>
+      
+      <guid>http://vindum.io/tags/x/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Y</title>
+      <link>http://vindum.io/tags/y/</link>
+      <pubDate>Mon, 02 Jan 2017 14:36:52 +0100</pubDate>
+      
+      <guid>http://vindum.io/tags/y/</guid>
+      <description></description>
+    </item>
+    
+  </channel>
+</rss>

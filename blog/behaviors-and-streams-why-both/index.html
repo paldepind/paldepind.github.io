@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+    <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="generator" content="Hugo 0.20.2" />
+
+
+<title>Behaviors and streams, why both? - Vindum</title>
+<meta property="og:title" content="Behaviors and streams, why both? - Vindum">
+
+
+
+  
+
+
+
+
+
+
+<link rel="stylesheet" href="http://vindum.io/css/main.css" media="all">
+<link rel="stylesheet" href="//fonts.googleapis.com/css?family=Merriweather:400|Lato:400,400italic,700">
+<link href="https://fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet">
+
+  </head>
+  <body>
+    <div class="wrapper">
+      <header class="header">
+        <nav class="nav">
+  
+
+  <ul class="nav-links">
+    
+    <li><a href="/">Posts</a></li>
+    
+    <li><a href="https://github.com/paldepind">GitHub</a></li>
+    
+    <li><a href="https://twitter.com/paldepind">Twitter</a></li>
+    
+  </ul>
+</nav>
+
+      </header>
+
+
+<main class="content" role="main">
+
+  <article class="article">
+    
+    <span class="article-duration">9 min read</span>
+    
+
+    <h1 class="article-title">Behaviors and streams, why both?</h1>
+
+    
+    <span class="article-date">May 12, 2017</span>
+    
+
+    <div class="article-content">
+      
+
+<h1 id="introduction">Introduction</h1>
+
+<p>Functional reactive programming (FRP) has historically included two
+different abstractions over time: behavior and stream. Today most FRP
+and FRP-inspired libraries only have a single abstraction over time.
+This one abstraction is typically called &ldquo;stream&rdquo; or &ldquo;observable&rdquo;.</p>
+
+<p>People used to these libraries may wonder: Why do I need both behavior
+and stream? I&rsquo;m doing fine with just streams/observables. Asking that
+is natural. In fact, when I wrote my first FRP library
+<a href="https://github.com/paldepind/flyd/">Flyd</a> I only included a single
+abstraction over time. I thought it was simpler than having two
+concepts.</p>
+
+<p>However, after digging deeper into FRP I came to see that one loses
+something very crucial when not making a distinction between behaviors
+and stream. What exactly that is is not obvious, however. In this blog
+post, I will try to explain what it is.</p>
+
+<h1 id="what-is-the-difference-anyway">What is the difference anyway?</h1>
+
+<p>Both behaviors and streams represent things that happen or changes
+over time. But still, they are very different. Visually this
+difference looks like this.</p>
+
+<p><img src="/behaviorstream.svg" alt="Diagram of behavior and stream" /></p>
+
+<p>Intuitively, a behavior is a value that changes over time. And a
+stream is something that has occurrences at specific moments in time.
+A behavior can be seen as a function over time. A stream, on the other
+hand, is a list of events associated with their time of occurrence.</p>
+
+<p>To figure out whether something is conceptually a behavior or a stream
+one can simply ask: Does this thing has a &ldquo;current value&rdquo; or does it
+instead have a &ldquo;last occurrence&rdquo;? In the first case, it is a behavior
+and in the later case a stream.</p>
+
+<p>The classic example is the mouse. Its position is a behavior while the
+clicks of its buttons are streams. Here are a few additional examples:</p>
+
+<ul>
+<li>Sunset is a stream. It doesn&rsquo;t have a current value but it does have
+a last occurrence.</li>
+<li>The position of the sun is a behavior since it always has a current
+value.</li>
+<li>The height of a tree is a behavior since it has a current value.</li>
+<li>Leaves falling off of a tree is a stream—we can tell when a
+leave last fell off the tree.</li>
+</ul>
+
+<p>As you can see things in the real world are either a behavior or a
+stream. So it seems natural that our programs should be able to
+express the difference as well.</p>
+
+<h1 id="how-can-one-get-away-without-both">How can one get away without both?</h1>
+
+<p>Most libraries that only have a single abstraction over time has one
+that is much more like a stream than like a behavior. They pretty much
+just lack behavior altogether. Whenever people say things such as &ldquo;an
+observable is like a list over time&rdquo; they are talking about streams.
+They can&rsquo;t be talking about a behavior because a behavior is a
+function over time.</p>
+
+<p>How do they compensate for the lack of behaviors? Well, essentially
+one just &ldquo;interprets&rdquo; a stream as a behavior. The image below
+illustrates this.</p>
+
+<p><img src="/stream-as-behavior.svg" alt="Stream as behavior" /></p>
+
+<p>On the left, we see an actual behavior and on the left we see a stream
+interpreted as a behavior. We simply remember the last occurrence and
+takes it to be the &ldquo;current value&rdquo; of the stream. Some libraries
+remember event occurrences like this by default while other have a
+variant of their stream/observable that does. So even though some
+libraries doesn&rsquo;t recognize behaviors as a separate thing they still
+need features to fill in the gap.</p>
+
+<p>The crucial question now is: What are the downsides to only supporting
+this &ldquo;fake&rdquo; behavior? What are the benefits of having an actual
+behavior separate from streams? Hang tight, because that is what the
+rest of this blog posts covers.</p>
+
+<h1 id="it-is-precise-and-explicit">It is precise and explicit</h1>
+
+<p>When programming it is generally good practice to use types that are
+as precise as possible. For instance, even though we could, in theory,
+represent all numbers as strings, we don&rsquo;t. Even when programming in a
+dynamic language like JavaScript it is a good idea to have an idea
+about which types of values your variables contain. For instance, you
+may be thinking things like &ldquo;this variable is a number&rdquo; and &ldquo;this
+variable is a string&rdquo;.</p>
+
+<p>Likewise, when programming with FRP it is beneficial to know which
+things in a program are behaviors and which things in a program are
+streams. Conceptually these are two different things! Asking yourself
+whether a certain phenomenon is a behavior or a stream is highly
+useful. It is a useful mental process that makes you more aware of
+what exactly you are dealing with. Making a distinction between
+behavior and streams gives us richer vocabulary. If your program also
+makes the distinction this richness will translate into programs that
+are more expressive and precise about they are talking about.</p>
+
+<p>On the other hand, expressing both behaviors and streams with a single
+abstraction makes it is impossible to make a clear distinction. That
+can create confusion and inhibit features and performance because two
+separate concerns are mixed into a single abstraction.</p>
+
+<h1 id="it-prevents-mistakes">It prevents mistakes</h1>
+
+<p>Libraries that makes a distinction between behaviors and streams can
+prevent many errors from happening.</p>
+
+<p>For instance, a behavior always has a current value. But, streams
+doesn&rsquo;t. This means that when a stream is used as a behavior the user
+will have to remember to supply some initial occurrence to the stream.
+If the user forgets that, a bug has been introduced.</p>
+
+<p>A library that recognizes behaviors can know exactly when it is
+dealing with such. When a current value is expected the API will
+require a behavior. And the API makes it impossible to create
+behaviors that don&rsquo;t have an initial value. This completely
+eliminates errors where initial values are missing.</p>
+
+<p>Another thing we can prevent with explicit behaviors is meaningless
+operations. There are a bunch of operations that we can apply to a
+stream that does not make sense on a behavior. Likewise, there are
+operations that make sense on a behavior but not on a stream.
+Libraries that can&rsquo;t tell the difference between behaviors and streams
+can&rsquo;t prevent people from carrying out operations that don&rsquo;t make
+sense.</p>
+
+<p>As an example, it makes sense to combine two streams by merging their
+occurrences. Visually it looks like this</p>
+
+<p><img src="/images/stream-combine.svg" alt="Diagram of combining streams" /></p>
+
+<p>However, combining two behaviors in this manner doesn&rsquo;t make any
+sense. But still, libraries that don&rsquo;t support behaviors can&rsquo;t prevent
+it. We may end up merging the position of one object with the position
+of another object. This will a result that no longer makes sense
+understood as a behavior. This can lead to code that does &ldquo;shady&rdquo; or
+confusing things by exploiting that behaviors are represented as
+stream.</p>
+
+<h1 id="it-is-a-higher-abstraction">It is a higher abstraction</h1>
+
+<p>Some behaviors have multiple representations as a streams. For
+instance, these two streams represent the exact same behavior.</p>
+
+<p><img src="/images/equivalent-streams.svg" alt="Diagram of combining streams" /></p>
+
+<p>Clearly, these &ldquo;extra&rdquo; occurrences don&rsquo;t change the streams meaning as
+a behavior. But a stream-only library doesn&rsquo;t know that. Since the
+library doesn&rsquo;t have the behavior abstraction but uses streams instead
+its API necessarily exposes how many occurrences a steam is made of.
+Even when it&rsquo;s used as a behavior.</p>
+
+<p>When implementing a behavior, the API can be designed such that
+&ldquo;peeking into&rdquo; the internal representation of a behavior in this
+manner is impossible. The library knows when the user actually wants
+to use a behavior. This allows for more optimizations since no
+implementation details are exposed.</p>
+
+<p>For instance, when implementing behavior with a dependency graph only
+actual changes in values have to be propagated. As an example of this,
+let&rsquo;s say a user writes the following:</p>
+<div class="highlight"><pre><code class="language-js" data-lang="js"><span></span><span class="kr">const</span> <span class="nx">flooredNumberBehavior</span> <span class="o">=</span> <span class="nx">numberBehavior</span><span class="p">.</span><span class="nx">map</span><span class="p">(</span><span class="nb">Math</span><span class="p">.</span><span class="nx">floor</span><span class="p">);</span>
+</code></pre></div>
+
+<p>Clearly some changes to <code>numberBehavior</code> won&rsquo;t lead to a change in
+<code>flooredNumberBehavior</code>. Maybe an update flows down that changes
+<code>numberBehavior</code> from <code>3.5</code> to <code>3.8</code>. In this case an implementation
+of behavior can recognize that nothing changes in
+<code>flooredNumberBehavior</code>. This allows it to simply stop propagating
+changes down.</p>
+
+<p>This can lead to substantial improvements to performance as it
+prevents needles re-computation. To , such an optimization can
+never be done. Because someone might call a method like <code>scan</code> later
+that exposes the number of occurrences and not just changes in value.</p>
+
+<h1 id="it-allows-for-infinite-resolution-behaviors">It allows for infinite resolution behaviors</h1>
+
+<p>While the stream interpreted as behavior, we saw above, can represent some
+behaviors it can&rsquo;t represent all behaviors. Some behaviors it can only
+crudely approximate. That is because a behavior can change &ldquo;infinitely
+often&rdquo;. I.e. be continuous. An example of such a behavior is seen below.</p>
+
+<p><img src="/images/stream-approximation.svg" alt="Approximating behavior with stream" /></p>
+
+<p>To the right, we have an attempt at approximating the behavior with a
+stream. Clearly, such an approximation is lossy and imprecise.</p>
+
+<p>Being able to represent these types of behaviors with infinite
+resolution is extremely beneficial. In particular, it is helpful when
+writing programs that deal with things such as time and motion. Like
+when implementing animations for instance.</p>
+
+<p>One may think that this problem can be avoided simply by using streams
+with a resolution that is &ldquo;good enough&rdquo;. But the problem is not only
+related to resolution. It is also a problem about composition.</p>
+
+<p>For instance, let&rsquo;s say you want to implement an animation with
+streams. You may think, I&rsquo;ll just create a stream that has an
+occurrence for each frame. Clearly, that resolution is good enough. But
+consider what then happens if you combine two such streams. For
+instance, you may have an <code>x</code>-coordinate that changes every frame and a
+<code>y</code>-coordinate that does the same. If you combine those you get a
+stream that changes twice every frame. That is pretty bad.</p>
+
+<p>With an FRP library that support continuous behaviors that problem does
+not exist. You&rsquo;d simply have a behavior for the <code>x</code>-coordinate and one
+for the <code>y</code>-coordinate. Internally those will be represented in a way
+that supports infinite resolution. Thus, when you combine them you
+simply get a third behavior, also of infinite resolution.</p>
+
+<p>The above problem is similar to vector graphics vs. pixel graphics.
+Vector graphics has infinite resolution. This means that we can, among
+other things, zoom in and rotate without losing quality. Of course, at
+some point, a vector image will have to be converted to pixels in
+order to be displayed on the screen. But such a conversion only
+happens at the very last step, after we have zoomed and rotated.
+Similarly, when working with behaviors of infinite resolution all
+operations on them happens to the internally infinite version. Only
+for the purpose of showing them on the screen are they converted to a
+format with the necessary resolution.</p>
+
+<h1 id="conclusion">Conclusion</h1>
+
+<p>We have seen some of the main benefits of recognizing that behaviors
+and streams are two different things. It may up front seem like having
+two abstractions is more complex that just one. But it turns out that
+down the road it makes things much simpler and more powerful. In
+general, programs that keep separate things separate are easier to
+understand.</p>
+
+    </div>
+  </article>
+
+  
+
+</main>
+
+      <footer class="footer">
+        <ul class="footer-links">
+          <li>
+            <a href="http://vindum.io/index.xml" type="application/rss+xml" target="_blank">RSS feed</a>
+          </li>
+          <li>
+            <a href="https://gohugo.io/" class="footer-links-kudos">Made with <img src="http://vindum.io/images/hugo-logo.png" width="22" height="22"></a>
+          </li>
+        </ul>
+      </footer>
+
+    </div>
+
+    
+  </body>
+</html>
+

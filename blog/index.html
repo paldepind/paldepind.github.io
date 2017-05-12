@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+    <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="generator" content="Hugo 0.18.1" />
+
+
+<title> - Vindum</title>
+<meta property="og:title" content=" - Vindum">
+
+
+
+  
+
+
+
+
+
+
+<link rel="stylesheet" href="http://vindum.io/css/main.css" media="all">
+<link rel="stylesheet" href="//fonts.googleapis.com/css?family=Merriweather:400|Lato:400,400italic,700">
+<link href="https://fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet">
+
+  </head>
+  <body>
+    <div class="wrapper">
+      <header class="header">
+        <nav class="nav">
+  
+
+  <ul class="nav-links">
+    
+    <li><a href="/">Posts</a></li>
+    
+    <li><a href="https://github.com/paldepind">GitHub</a></li>
+    
+    <li><a href="https://twitter.com/paldepind">Twitter</a></li>
+    
+  </ul>
+</nav>
+
+      </header>
+
+
+<main class="content" role="main">
+
+  <article class="article">
+    
+    <span class="article-duration">3 min read</span>
+    
+
+    <h1 class="article-title"></h1>
+
+    
+    <span class="article-date">January 1, 0001</span>
+    
+
+    <div class="article-content">
+      
+
+<h2 id="introduction">Introduction</h2>
+
+<p>FRP was originally described and invented by Conal Elliott as a way to
+create interactive applications in a purely functional setting. The
+original model was extraordinarily simple yet powerful. Since then FRP
+has evolved in several directions. However many of these seem to miss
+the pricinpals and ideas found in original FRP. This is a shame
+because the design of FRP springs from a software philosophy that is
+brilliant, beautiful and rarely found elsewhere. I believe the reason
+might be that FRP the ideas behind it have not been explained in an
+accessible way. Thus in this article I will do my best to explain
+<em>classic</em> FRP. That is, FRP as was originally concieved.</p>
+
+<p>FRP as originally formulated by Conal Elliott is widely misunderstood.
+It&rsquo;s unfortunate, because it is not only a beautiful and powerful
+model for creating interactive applications. It also springs from a
+software design philosophy that is mind expanding in its brilliance
+and very rarely found elsewhere. Certainly not in any of the reactive
+libraries that are in mainstream use today.</p>
+
+<p>In this article I will do my best to describe both <em>what</em> classical
+FRP is but also <em>why</em> it is the way it is.</p>
+
+<blockquote>
+<p>If you don&rsquo;t understand FRP you are doomed to reinvent it poorly.</p>
+</blockquote>
+
+<h2 id="behaviors-and-events">Behaviors and events</h2>
+
+<p>A behavior is a function from time to a value.</p>
+
+<p>An event is a list of values tagged with timestamps.</p>
+
+<h2 id="why-contionus-time">Why contionus time?</h2>
+
+<p>To some people continuous time seems irrelevant. They argue that
+because computers are inherently discrete continuous time does not
+matter. That is like saying that because computers are inherently
+sequential and imperative we should not bother with structured
+programming and certainly not functional programming. It is like
+saying that because all screens has pixels we shouldn&rsquo;t bother with
+vector graphics. This misunderstanding is even deeper than that
+because it misses one of the key ideas in denotations design: that our
+programs should express what things <em>are</em> rather than <em>how</em> things are
+implemented on the machine. We should have a declarative model that
+says what we <em>mean</em>. Then how to realize that on hardware is an
+implementation detail.</p>
+
+<p>Physical phenomenon can either be continuous or discrete. That is why
+FRP has exactly two representations, events and behaviors. Almost all
+reactive library that only has one representation for values that can
+change over time lacks the power to accurately model &ldquo;half&rdquo; of the
+world.</p>
+
+<p>A lot of really clever people don&rsquo;t understand continuous time</p>
+
+<h2 id="what-does-composability-mean">What does composability mean?</h2>
+
+<p>Composability is an often used word to describe a desirable aspect of
+software design. It is typically taken to mean something like &ldquo;things
+that can be put together to form new things that can also be put
+together&rdquo;. This is the idea that is embedded in the &ldquo;Composable
+Pattern&rdquo; from OOP. But as a software design principle we can take the
+idea even further. &hellip; That is why lazyness makes makes programs more
+composable. With lazyness a function canvas, for instance, return an
+infinite data-structure of results. That is, it makes not assumption
+about what the caller needs from the data-structure. Instead the
+caller can consume exactly what it needs, and only that will be
+computed. That is a higher form of composability. Similarly FRPs model
+of continuous time allows for better composability.</p>
+
+<p>Principle: Appoximations/prunings compose badly, so postpon</p>
+
+<h2 id="the-problem-with-classic-frp">The problem with classic FRP</h2>
+
+    </div>
+  </article>
+
+  
+
+</main>
+
+      <footer class="footer">
+        <ul class="footer-links">
+          <li>
+            <a href="http://vindum.io/index.xml" type="application/rss+xml" target="_blank">RSS feed</a>
+          </li>
+          <li>
+            <a href="https://gohugo.io/" class="footer-links-kudos">Made with <img src="http://vindum.io/images/hugo-logo.png" width="22" height="22"></a>
+          </li>
+        </ul>
+      </footer>
+
+    </div>
+
+    
+  </body>
+</html>
+

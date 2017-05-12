@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes" ?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>Functional Reactive Programming on Vindum</title>
-    <link>http://vindum.io/tags/functional-reactive-programming/</link>
-    <description>Recent content in Functional Reactive Programming on Vindum</description>
+    <title>Behavior on Vindum</title>
+    <link>http://vindum.io/tags/behavior/</link>
+    <description>Recent content in Behavior on Vindum</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     <lastBuildDate>Fri, 12 May 2017 14:25:45 +0100</lastBuildDate>
     
-	<atom:link href="http://vindum.io/tags/functional-reactive-programming/index.xml" rel="self" type="application/rss+xml" />
+	<atom:link href="http://vindum.io/tags/behavior/index.xml" rel="self" type="application/rss+xml" />
     
     
     <item>
@@ -19,16 +19,6 @@
       <guid>http://vindum.io/blog/behaviors-and-streams-why-both/</guid>
       <description>Introduction Functional reactive programming (FRP) has historically included two different abstractions over time: behavior and stream. Today most FRP and FRP-inspired libraries only have a single abstraction over time. This one abstraction is typically called &amp;ldquo;stream&amp;rdquo; or &amp;ldquo;observable&amp;rdquo;.
 People used to these libraries may wonder: Why do I need both behavior and stream? I&amp;rsquo;m doing fine with just streams/observables. Asking that is natural. In fact, when I wrote my first FRP library Flyd I only included a single abstraction over time.</description>
-    </item>
-    
-    <item>
-      <title>Let&#39;s reinvent FRP</title>
-      <link>http://vindum.io/blog/lets-reinvent-frp/</link>
-      <pubDate>Sat, 18 Feb 2017 14:25:45 +0100</pubDate>
-      
-      <guid>http://vindum.io/blog/lets-reinvent-frp/</guid>
-      <description>Introduction In this blog post we will set out on a journey to reinvent functional reactive programming. FRP is an elegant and powerful way to express interactive programs in a purely functional way. More than that, it embodies an approach to library design called denotational design that has utility way beyond FRP. The technique is both brilliant and very different from how most developers think about library design.
-Many modern libraries aim to solve the same problem that FRP did.</description>
     </item>
     
   </channel>

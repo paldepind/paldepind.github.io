@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Categories on Vindum</title>
+    <link>http://vindum.io/categories/</link>
+    <description>Recent content in Categories on Vindum</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    
+	<atom:link href="http://vindum.io/categories/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>X</title>
+      <link>http://vindum.io/categories/x/</link>
+      <pubDate>Mon, 02 Jan 2017 14:36:52 +0100</pubDate>
+      
+      <guid>http://vindum.io/categories/x/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Y</title>
+      <link>http://vindum.io/categories/y/</link>
+      <pubDate>Mon, 02 Jan 2017 14:36:52 +0100</pubDate>
+      
+      <guid>http://vindum.io/categories/y/</guid>
+      <description></description>
+    </item>
+    
+  </channel>
+</rss>

@@ -2,18 +2,21 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>X on Vindum</title>
-    <link>http://vindum.io/tags/x/index.xml</link>
+    <link>http://vindum.io/tags/x/</link>
     <description>Recent content in X on Vindum</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <atom:link href="http://vindum.io/tags/x/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Mon, 02 Jan 2017 14:36:52 +0100</lastBuildDate>
+    
+	<atom:link href="http://vindum.io/tags/x/index.xml" rel="self" type="application/rss+xml" />
+    
     
     <item>
       <title></title>
-      <link>http://vindum.io/about/</link>
+      <link>http://vindum.io/about/index/</link>
       <pubDate>Mon, 02 Jan 2017 14:36:52 +0100</pubDate>
       
-      <guid>http://vindum.io/about/</guid>
+      <guid>http://vindum.io/about/index/</guid>
       <description></description>
     </item>
     
