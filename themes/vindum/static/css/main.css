@@ -8,6 +8,7 @@ body {
 }
 
 body {
+  background: #fffffe;
   font-family: 'Merriweather', serif;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
@@ -142,7 +143,7 @@ a {
   /* background-size: 0.05em 1px, 0.05em 1px, 1px 1px; */
   /* background-repeat: no-repeat, no-repeat, repeat-x; */
   /* background-position: 0% 93%, 100% 93%, 0% 93%; */
-  text-shadow: 0.03em 0 #fffff8, -0.03em 0 #fffff8, 0 0.03em #fffff8, 0 -0.03em #fffff8, 0.06em 0 #fffff8, -0.06em 0 #fffff8, 0.09em 0 #fffff8, -0.09em 0 #fffff8, 0.12em 0 #fffff8, -0.12em 0 #fffff8, 0.15em 0 #fffff8, -0.15em 0 #fffff8;
+  text-shadow: 0.03em 0 #fffffe, -0.03em 0 #fffffe, 0 0.03em #fffffe, 0 -0.03em #fffffe, 0.06em 0 #fffffe, -0.06em 0 #fffffe, 0.09em 0 #fffffe, -0.09em 0 #fffffe, 0.12em 0 #fffffe, -0.12em 0 #fffffe, 0.15em 0 #fffffe, -0.15em 0 #fffffe;
 }
 
 a:link::selection {
