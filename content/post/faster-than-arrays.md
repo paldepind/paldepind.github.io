@@ -1,7 +1,7 @@
 +++
 description = ""
 title = "How can List be faster than native arrays?"
-date = "2018-05-05T14:25:45+01:00"
+date = "2018-05-06T14:25:45+01:00"
 categories = []
 tags = ["typescript", "javascript", "data-structures"]
 draft = false
@@ -19,8 +19,10 @@ about List (thanks a lot). One of the things he mentioned was the
 claim that List is faster than arrays. Several people responded with a
 healthy skepticism to this statement. How can something be faster than
 arrays which are native to JavaScript and highly optimized by the
-JavaScript engines? This blog post will attempt to answer that
-question.
+JavaScript engines? The short answer is that by exploiting
+immutability List can avoid a lot of unnececarry copying through
+structural sharing. This blog post will go into more detail and show
+how structural sharing leads to huge improvements in performance. 
 
 # The problem with arrays
 
