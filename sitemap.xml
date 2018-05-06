@@ -1,5 +1,11 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes" ?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+  xmlns:xhtml="http://www.w3.org/1999/xhtml">
+  
+  <url>
+    <loc>http://vindum.io/blog/how-can-list-be-faster-than-native-arrays/</loc>
+    <lastmod>2018-05-05T14:25:45+01:00</lastmod>
+  </url>
   
   <url>
     <loc>http://vindum.io/blog/behaviors-and-streams-why-both/</loc>
@@ -17,14 +23,8 @@
   </url>
   
   <url>
-    <loc>http://vindum.io/about/index/</loc>
-    <lastmod>2017-01-02T14:36:52+01:00</lastmod>
-  </url>
-  
-  <url>
     <loc>http://vindum.io/about/</loc>
     <lastmod>2017-01-02T14:36:52+01:00</lastmod>
-    <priority>0</priority>
   </url>
   
   <url>
@@ -35,6 +35,12 @@
   
   <url>
     <loc>http://vindum.io/categories/</loc>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>http://vindum.io/tags/data-structures/</loc>
+    <lastmod>2018-05-05T14:25:45+01:00</lastmod>
     <priority>0</priority>
   </url>
   
@@ -52,13 +58,13 @@
   
   <url>
     <loc>http://vindum.io/tags/javascript/</loc>
-    <lastmod>2017-05-12T14:25:45+01:00</lastmod>
+    <lastmod>2018-05-05T14:25:45+01:00</lastmod>
     <priority>0</priority>
   </url>
   
   <url>
     <loc>http://vindum.io/post/</loc>
-    <lastmod>2017-05-12T14:25:45+01:00</lastmod>
+    <lastmod>2018-05-05T14:25:45+01:00</lastmod>
     <priority>0</priority>
   </url>
   
@@ -70,13 +76,13 @@
   
   <url>
     <loc>http://vindum.io/tags/typescript/</loc>
-    <lastmod>2017-05-12T14:25:45+01:00</lastmod>
+    <lastmod>2018-05-05T14:25:45+01:00</lastmod>
     <priority>0</priority>
   </url>
   
   <url>
     <loc>http://vindum.io/</loc>
-    <lastmod>2017-05-12T14:25:45+01:00</lastmod>
+    <lastmod>2018-05-05T14:25:45+01:00</lastmod>
     <priority>0</priority>
   </url>
   

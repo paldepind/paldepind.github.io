@@ -6,10 +6,20 @@
     <description>Recent content in Javascript on Vindum</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Fri, 12 May 2017 14:25:45 +0100</lastBuildDate>
+    <lastBuildDate>Sat, 05 May 2018 14:25:45 +0100</lastBuildDate>
     
 	<atom:link href="http://vindum.io/tags/javascript/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>How can List be faster than native arrays?</title>
+      <link>http://vindum.io/blog/how-can-list-be-faster-than-native-arrays/</link>
+      <pubDate>Sat, 05 May 2018 14:25:45 +0100</pubDate>
+      
+      <guid>http://vindum.io/blog/how-can-list-be-faster-than-native-arrays/</guid>
+      <description>List is an extremely fast immutable list that can be used as an alternative to native JavaScript arrays. Since List is immutable it is made for functional programming. For this use case it is often much faster than native JavaScript arrays and libraries that operate on arrays like Lodash and Ramda.
+Jeremy Likness recently tweeted about List (thanks a lot). One of the things he mentioned was the claim that List is faster than arrays.</description>
+    </item>
     
     <item>
       <title>Behaviors and streams, why both?</title>

@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="generator" content="Hugo 0.20.2" />
+<meta name="generator" content="Hugo 0.40.2" />
 
 
 <title>Behaviors and streams, why both? - Vindum</title>
@@ -45,10 +45,11 @@
 
 <main class="content" role="main">
 
-  <article class="article">
-    
+  <div class="article-duration-wrapper">
     <span class="article-duration">9 min read</span>
-    
+  </div>
+  <article class="article">
+     
 
     <h1 class="article-title">Behaviors and streams, why both?</h1>
 
@@ -225,9 +226,8 @@ implementation details are exposed.</p>
 <p>For instance, when implementing behavior with a dependency graph only
 actual changes in values have to be propagated. As an example of this,
 let&rsquo;s say a user writes the following:</p>
-<div class="highlight"><pre><code class="language-js" data-lang="js"><span></span><span class="kr">const</span> <span class="nx">flooredNumberBehavior</span> <span class="o">=</span> <span class="nx">numberBehavior</span><span class="p">.</span><span class="nx">map</span><span class="p">(</span><span class="nb">Math</span><span class="p">.</span><span class="nx">floor</span><span class="p">);</span>
+<div class="highlight"><pre class="chroma"><code class="language-js" data-lang="js"><span class="k">const</span> <span class="nx">flooredNumberBehavior</span> <span class="o">=</span> <span class="nx">numberBehavior</span><span class="p">.</span><span class="nx">map</span><span class="p">(</span><span class="nb">Math</span><span class="p">.</span><span class="nx">floor</span><span class="p">);</span>
 </code></pre></div>
-
 <p>Clearly some changes to <code>numberBehavior</code> won&rsquo;t lead to a change in
 <code>flooredNumberBehavior</code>. Maybe an update flows down that changes
 <code>numberBehavior</code> from <code>3.5</code> to <code>3.8</code>. In this case an implementation
@@ -318,4 +318,3 @@ understand.</p>
     
   </body>
 </html>
-

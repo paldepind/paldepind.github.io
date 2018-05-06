@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="generator" content="Hugo 0.20.2" />
+<meta name="generator" content="Hugo 0.40.2" />
 
 
 <title>Introducing Jabz - Vindum</title>
@@ -45,10 +45,11 @@
 
 <main class="content" role="main">
 
-  <article class="article">
-    
+  <div class="article-duration-wrapper">
     <span class="article-duration">11 min read</span>
-    
+  </div>
+  <article class="article">
+     
 
     <h1 class="article-title">Introducing Jabz</h1>
 
@@ -140,11 +141,10 @@ prefer the name <code>foldr</code> so I&rsquo;ll use that going forward).</p>
 building on top of this single method, we can create many more. For
 instance, we can derive a function for getting the number of elements in
 any foldable.</p>
-<div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span></span><span class="kd">function</span> <span class="nx">size</span><span class="p">(</span><span class="nx">foldable</span><span class="p">)</span> <span class="p">{</span>
+<div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="kd">function</span> <span class="nx">size</span><span class="p">(</span><span class="nx">foldable</span><span class="p">)</span> <span class="p">{</span>
   <span class="k">return</span> <span class="nx">foldable</span><span class="p">.</span><span class="nx">foldr</span><span class="p">((</span><span class="nx">n</span><span class="p">,</span> <span class="nx">m</span><span class="p">)</span> <span class="p">=&gt;</span> <span class="nx">n</span> <span class="o">+</span> <span class="nx">m</span><span class="p">,</span> <span class="mi">0</span><span class="p">);</span>
 <span class="p">}</span>
 </code></pre></div>
-
 <p>This is an example of a derived method.</p>
 
 <div class="info-box">
@@ -208,15 +208,14 @@ implementations.</p>
 <p>For instance, Jabz requires functors to have both a <code>map</code> and a <code>mapTo</code>
 method. But since <code>mapTo</code> can be derived from <code>map</code>, an implementation
 doesn&rsquo;t have to specify it. A functor can be implemented like this</p>
-<div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span></span><span class="err">@</span><span class="nx">functor</span>
-<span class="kr">class</span> <span class="nx">MyFunctor</span> <span class="p">{</span>
+<div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="err">@</span><span class="nx">functor</span>
+<span class="k">class</span> <span class="nx">MyFunctor</span> <span class="p">{</span>
   <span class="p">...</span>
   <span class="nx">map</span><span class="p">(</span><span class="nx">f</span><span class="p">)</span> <span class="p">{</span>
     <span class="p">...</span>
   <span class="p">}</span>
 <span class="p">}</span>
 </code></pre></div>
-
 <p>The <code>functor</code> function ensures that <code>MyFunctor</code> satisfies the functor
 specification. It automatically installs a default derived <code>mapTo</code> on
 <code>MyFunctor</code>s prototype. Each abstraction in Jabz comes with a matching
@@ -250,15 +249,13 @@ arguments to <code>n</code> functors. That is what applicative was made for.</p>
 <p>If <code>f</code> is a function from three arguments and <code>a</code>, <code>b</code> and <code>c</code> are
 applicatives, we can use Fantasy Lands <code>ap</code> like this to apply <code>f</code> to
 the applicatives:</p>
-<div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span></span><span class="nx">c</span><span class="p">.</span><span class="nx">ap</span><span class="p">(</span><span class="nx">b</span><span class="p">.</span><span class="nx">ap</span><span class="p">(</span><span class="nx">a</span><span class="p">.</span><span class="nx">map</span><span class="p">(</span><span class="k">of</span><span class="p">(</span><span class="nx">f</span><span class="p">))));</span>
+<div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="nx">c</span><span class="p">.</span><span class="nx">ap</span><span class="p">(</span><span class="nx">b</span><span class="p">.</span><span class="nx">ap</span><span class="p">(</span><span class="nx">a</span><span class="p">.</span><span class="nx">map</span><span class="p">(</span><span class="k">of</span><span class="p">(</span><span class="nx">f</span><span class="p">))));</span>
 </code></pre></div>
-
 <p>This an awkward way of applying a function to two applicatives. So
 we&rsquo;d probably abstract the pattern into a function called <code>lift</code>. It
 might work like this:</p>
-<div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span></span><span class="nx">lift</span><span class="p">(</span><span class="nx">f</span><span class="p">,</span> <span class="nx">a</span><span class="p">,</span> <span class="nx">b</span><span class="p">,</span> <span class="nx">c</span><span class="p">);</span>
+<div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="nx">lift</span><span class="p">(</span><span class="nx">f</span><span class="p">,</span> <span class="nx">a</span><span class="p">,</span> <span class="nx">b</span><span class="p">,</span> <span class="nx">c</span><span class="p">);</span>
 </code></pre></div>
-
 <p>However, there is a problem here. Let&rsquo;s say <code>f</code> is any function taking
 <code>n</code> arguments. If we only have the methods <code>ap</code> and <code>of</code>, there is no
 way to apply <code>f</code> to <code>n</code> applicatives without currying <code>f</code> and calling
@@ -276,12 +273,10 @@ once.</p>
 <p>To see what the difference can be in practice I&rsquo;ve created a small
 benchmark that compares lifting a function over Jabz&rsquo;s <code>Maybe</code> with
 <code>lift</code> and with <code>ap</code>. <a href="https://github.com/Funkia/jabz/blob/master/benchmark/aplift.suite.js">The source code can be found here</a>.</p>
-<div class="highlight"><pre><code class="language-bash" data-lang="bash"><span></span>-------------------- <span class="sb">`</span>ap<span class="sb">`</span> vs <span class="sb">`</span>lift<span class="sb">`</span> on <span class="sb">`</span>Maybe<span class="sb">`</span> --------------------
+<div class="highlight"><pre class="chroma"><code class="language-bash" data-lang="bash">-------------------- <span class="sb">`</span>ap<span class="sb">`</span> vs <span class="sb">`</span>lift<span class="sb">`</span> on <span class="sb">`</span>Maybe<span class="sb">`</span> --------------------
 lift                        <span class="m">9150491</span>.49 op/s ±  <span class="m">4</span>.45%   <span class="o">(</span><span class="m">68</span> samples<span class="o">)</span>
 ap                          <span class="m">1665864</span>.27 op/s ±  <span class="m">1</span>.31%   <span class="o">(</span><span class="m">85</span> samples<span class="o">)</span>
----------------------------- Best: lift ----------------------------
-</code></pre></div>
-
+---------------------------- Best: lift ----------------------------</code></pre></div>
 <p>Of course this is a small micro-benchmark but it does show that
 lifting a function with <code>ap</code> is expensive. Since lifting is pretty
 much what applicatives are good for, this means that Jabz applicatives
@@ -300,20 +295,17 @@ library <a href="https://github.com/russellmcc/fantasydo">Fantasy Do</a>. Jabz
 implements this and calls it &ldquo;go-notation&rdquo;—because <code>do</code> is a reserved
 word in JavaScript. It might stand for &ldquo;<strong>G</strong>enerato-d<strong>O</strong>-notation&rdquo;.
 With this technique we can get do-notation like this.</p>
-<div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span></span><span class="kr">const</span> <span class="nx">value</span> <span class="o">=</span> <span class="nx">go</span><span class="p">(</span><span class="kd">function</span><span class="o">*</span><span class="p">()</span> <span class="p">{</span>
-  <span class="kr">const</span> <span class="nx">a</span> <span class="o">=</span> <span class="k">yield</span> <span class="nx">someFunctionReturningAMonad</span><span class="p">(</span><span class="mi">1</span><span class="p">);</span>
-  <span class="kr">const</span> <span class="nx">b</span> <span class="o">=</span> <span class="k">yield</span> <span class="nx">iAlsoReturnAMonad</span><span class="p">(</span><span class="mi">2</span><span class="p">);</span>
+<div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="k">const</span> <span class="nx">value</span> <span class="o">=</span> <span class="nx">go</span><span class="p">(</span><span class="kd">function</span><span class="o">*</span><span class="p">()</span> <span class="p">{</span>
+  <span class="k">const</span> <span class="nx">a</span> <span class="o">=</span> <span class="k">yield</span> <span class="nx">someFunctionReturningAMonad</span><span class="p">(</span><span class="mi">1</span><span class="p">);</span>
+  <span class="k">const</span> <span class="nx">b</span> <span class="o">=</span> <span class="k">yield</span> <span class="nx">iAlsoReturnAMonad</span><span class="p">(</span><span class="mi">2</span><span class="p">);</span>
   <span class="k">return</span> <span class="nx">doSomethingWithTheBoundValues</span><span class="p">(</span><span class="nx">a</span><span class="p">,</span> <span class="nx">b</span><span class="p">);</span>
 <span class="p">});</span>
 </code></pre></div>
-
 <p>which is comparable to</p>
-<div class="highlight"><pre><code class="language-haskell" data-lang="haskell"><span></span><span class="nf">value</span> <span class="ow">=</span> <span class="kr">do</span>
-  <span class="n">a</span> <span class="ow">&lt;-</span> <span class="n">someFunctionReturningAMonad</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
-  <span class="n">b</span> <span class="ow">&lt;-</span> <span class="n">iAlsoReturnAMonad</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
-  <span class="n">return</span> <span class="n">doSomethingWithTheBoundValues</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span>
-</code></pre></div>
-
+<div class="highlight"><pre class="chroma"><code class="language-haskell" data-lang="haskell"><span class="nf">value</span> <span class="ow">=</span> <span class="kr">do</span>
+  <span class="nf">a</span> <span class="ow">&lt;-</span> <span class="nf">someFunctionReturningAMonad</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+  <span class="nf">b</span> <span class="ow">&lt;-</span> <span class="nf">iAlsoReturnAMonad</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+  <span class="nf">return</span> <span class="nf">doSomethingWithTheBoundValues</span><span class="p">(</span><span class="nf">a</span><span class="p">,</span> <span class="nf">b</span><span class="p">)</span></code></pre></div>
 <p>So the string &ldquo;<code>= yield</code>&rdquo; should be read as Haskell&rsquo;s &ldquo;<code>&lt;-</code>&rdquo;.</p>
 
 <p>This form of do-notation is immensely useful. But due to some
@@ -328,15 +320,14 @@ it should.</p>
 <p>Let&rsquo;s say we have an interface for monads with a <code>random</code> method. The
 <code>random</code> method takes two integers and returns, in the monad, a
 random integer between the two. Then we might write code like this:</p>
-<div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span></span><span class="kd">function</span> <span class="nx">veryRandom</span><span class="p">(</span><span class="nx">m</span><span class="p">,</span> <span class="nx">n</span><span class="p">)</span> <span class="p">{</span>
+<div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="kd">function</span> <span class="nx">veryRandom</span><span class="p">(</span><span class="nx">m</span><span class="p">,</span> <span class="nx">n</span><span class="p">)</span> <span class="p">{</span>
   <span class="k">return</span> <span class="k">do</span><span class="p">(</span><span class="kd">function</span><span class="o">*</span><span class="p">()</span> <span class="p">{</span>
-    <span class="kr">const</span> <span class="nx">a</span> <span class="o">=</span> <span class="k">yield</span> <span class="nx">m</span><span class="p">.</span><span class="nx">random</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nx">n</span><span class="p">);</span>
-    <span class="kr">const</span> <span class="nx">b</span> <span class="o">=</span> <span class="k">yield</span> <span class="nx">m</span><span class="p">.</span><span class="nx">random</span><span class="p">(</span><span class="nx">n</span><span class="p">,</span> <span class="nx">n</span> <span class="o">*</span> <span class="nx">n</span><span class="p">);</span>
+    <span class="k">const</span> <span class="nx">a</span> <span class="o">=</span> <span class="k">yield</span> <span class="nx">m</span><span class="p">.</span><span class="nx">random</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nx">n</span><span class="p">);</span>
+    <span class="k">const</span> <span class="nx">b</span> <span class="o">=</span> <span class="k">yield</span> <span class="nx">m</span><span class="p">.</span><span class="nx">random</span><span class="p">(</span><span class="nx">n</span><span class="p">,</span> <span class="nx">n</span> <span class="o">*</span> <span class="nx">n</span><span class="p">);</span>
     <span class="k">return</span> <span class="nx">m</span><span class="p">.</span><span class="k">of</span><span class="p">(</span><span class="nx">a</span> <span class="o">+</span> <span class="nx">b</span><span class="p">);</span>
   <span class="p">});</span>
 <span class="p">}</span>
 </code></pre></div>
-
 <p>The example is fairly silly, but the point is that <code>veryRandom</code> should
 work for <em>any</em> monad <code>m</code> that has a <code>random</code> method. One monad that
 might implement this is <code>IO</code>, which would actually generate a random
@@ -362,11 +353,10 @@ let&rsquo;s instead look at how Jabz regains some power that was otherwise
 lost to the fact that JavaScript isn&rsquo;t lazy.</p>
 
 <p>Consider the aforementioned <code>find</code>.</p>
-<div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span></span><span class="kd">function</span> <span class="nx">find</span><span class="p">(</span><span class="nx">predicate</span><span class="p">,</span> <span class="nx">foldable</span><span class="p">)</span> <span class="p">{</span>
+<div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="kd">function</span> <span class="nx">find</span><span class="p">(</span><span class="nx">predicate</span><span class="p">,</span> <span class="nx">foldable</span><span class="p">)</span> <span class="p">{</span>
   <span class="k">return</span> <span class="nx">foldable</span><span class="p">.</span><span class="nx">foldr</span><span class="p">((</span><span class="nx">e</span><span class="p">,</span> <span class="nx">a</span><span class="p">)</span> <span class="p">=&gt;</span> <span class="nx">predicate</span><span class="p">(</span><span class="nx">e</span><span class="p">)</span> <span class="o">?</span> <span class="nx">just</span><span class="p">(</span><span class="nx">e</span><span class="p">)</span> <span class="o">:</span> <span class="nx">a</span><span class="p">,</span> <span class="nx">nothing</span><span class="p">());</span>
 <span class="p">}</span>
 </code></pre></div>
-
 <p>Had we coded this nifty function in Haskell, execution would have
 stopped as soon as an element in the foldable satisfying the predicate
 had been found. So is the beauty of laziness. JavaScript, on the other
@@ -388,9 +378,8 @@ are <code>find</code>, <code>findLast</code>, <code>take</code> and <code>any</c
 <p>Additionally, this also means that infinite data structures can be used
 with Jabz&rsquo;s foldable. In fact, Jabz ships with a simple infinite lazy
 list.</p>
-<div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span></span><span class="nx">take</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="nx">map</span><span class="p">((</span><span class="nx">n</span><span class="p">)</span> <span class="p">=&gt;</span> <span class="nx">n</span> <span class="o">*</span> <span class="nx">n</span><span class="p">),</span> <span class="nx">naturals</span><span class="p">);</span> <span class="c1">//=&gt; [0, 1, 4, 9, 16]</span>
-</code></pre></div>
-
+<div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="nx">take</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="nx">map</span><span class="p">((</span><span class="nx">n</span><span class="p">)</span> <span class="p">=&gt;</span> <span class="nx">n</span> <span class="o">*</span> <span class="nx">n</span><span class="p">),</span> <span class="nx">naturals</span><span class="p">);</span> <span class="c1">//=&gt; [0, 1, 4, 9, 16]
+</span><span class="c1"></span></code></pre></div>
 <p>Here <code>naturals</code> is an infinite list of the natural numbers. First we
 square them with <code>map</code> and then we take the first five with <code>take</code>.
 This is possible since <code>take</code> utilizes the <code>shortFoldl</code> method on
@@ -436,4 +425,3 @@ is much appreciated.</p>
     
   </body>
 </html>
-
