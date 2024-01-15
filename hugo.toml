@@ -1,7 +1,7 @@
 languageCode = "en-us"
-theme = "vindum"
-title = "Vindum"
-baseurl = "http://vindum.io/"
+theme = "etch"
+title = "paldepind"
+baseurl = "https://monoid.dk/"
 
 PygmentsCodeFences = true
 pygmentsuseclasses = true
